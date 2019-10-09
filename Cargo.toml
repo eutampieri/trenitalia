@@ -7,5 +7,9 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-hyper = "0.10"
+reqwest = "0.9"
 drs-primitives = { git = "https://github.com/eutampieri/drs-primitives" }
+serde = "1.0"
+serde_json = "1.0"
+serde_derive = "1.0"
+chrono = "0.4"
