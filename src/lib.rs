@@ -29,7 +29,6 @@ impl Trenitalia {
         let mut station_list = station_list_tsv.split("\n").collect::<Vec<&str>>();
         station_list.remove(0);
         station_list.remove(&station_list.len()-1);
-        println!("{:?}", &station_list[0]);
         let mapped_stations: Vec<TrainStation> = station_list.iter()
             .map(|&x| x.split("\t").collect::<Vec<&str>>())
             .collect::<Vec<Vec<&str>>>().iter()
@@ -39,8 +38,12 @@ impl Trenitalia {
             }, region_id: x[2].parse::<u8>().unwrap()}).collect();
         Trenitalia{stations: mapped_stations}
     }
-    pub fn find_journey(&self, from: &TrainStation, to: &TrainStation){
-        let url = format!("http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/soluzioniViaggioNew/{}/{}/2019-09-20T08:00:00", from.short_id(), to.short_id());
+    pub fn find_journey(&self, from: &TrainStation, to: &TrainStation, when: &chrono::DateTime<chrono::Local>){
+        let url = format!("http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/soluzioniViaggioNew/{}/{}/{}",
+            from.short_id(),
+            to.short_id(),
+            when.format("%FT%T")
+        );
         println!("{}", url);
         let body: mapping::JourneySearchResult = reqwest::get(url.as_str()).unwrap().json().unwrap();
         println!("{:?}", body);
@@ -75,6 +78,6 @@ mod tests {
         let _carnia = t.nearest_station((46.374318, 13.134141));
         let imola = t.nearest_station((44.3533, 11.7141));
         let cesena = t.nearest_station((44.133333, 12.233333));
-        t.find_journey(imola, cesena);
+        t.find_journey(imola, cesena, &chrono::Local::now());
     }
 }
