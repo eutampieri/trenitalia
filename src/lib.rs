@@ -135,6 +135,9 @@ impl Trenitalia {
         //return Some(&self.stations[0]);
         let url = format!("http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/autocompletaStazione/{}", name);
         let response = reqwest::get(&url).unwrap().text().unwrap();
+        if response.len() == 0 {
+            return None;
+        }
         let body: Vec<Vec<&str>> = response.trim_end_matches('\n')
         .split("\n").collect::<Vec<&str>>().iter()
         .map(|&x| x.split("|").collect::<Vec<&str>>()).collect();
@@ -197,6 +200,7 @@ impl Trenitalia {
                 if min_diff == 0.0 {unimplemented!()} else {station_code}
             }
         };
+        self.train_info_raw(number, train_station_of_origination)
     }
     pub fn train_info_through_station(&self, number: &str, through: &TrainStation) {
 
