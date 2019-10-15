@@ -127,16 +127,21 @@ impl Trenitalia {
     }
 
     pub fn find_train_station_offline(&self, name: &str) -> Option<&TrainStation> {
-        let mut min_diff = std::f64::MAX;
+        let mut min_diff = 0.0;
         let mut found_station = &self.stations[0];
         for station in &self.stations {
-            let diff = strsim::normalized_damerau_levenshtein(&station.name, name);
-            if diff < min_diff {
+            if station.name == name {
+                return Some(station);
+            }
+        }
+        for station in &self.stations {
+            let diff = strsim::normalized_damerau_levenshtein(&station.name.to_lowercase(), &name.to_lowercase());
+            if diff > min_diff {
                 min_diff = diff;
                 found_station = station;
             }
         }
-        if min_diff > 0.8 {Some(found_station)} else {None}
+        if min_diff > 0.65 {Some(found_station)} else {None}
     }
 
     pub fn train_info(&self, number: String, from: String) {
