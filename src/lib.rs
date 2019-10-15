@@ -3,6 +3,27 @@ use drs_primitives::*;
 
 mod mapping;
 
+// TODO Aggiungere tipi treno
+pub enum TrainType{
+    Regionale,
+    RegionaleVeloce,
+}
+
+pub struct TrainTripStop {
+    pub station: TrainStation,
+    pub platform: String,
+    pub arrival: chrono::Local,
+    pub departure: chrono::Local,
+}
+
+pub struct TrainTrip {
+    pub from: TrainStation,
+    pub to: TrainStation, 
+    pub train_number: String,
+    pub train_type: TrainType,
+    pub stops: Vec<TrainTripStop>,
+}
+
 #[derive(Debug)]
 pub struct TrainStation {
     pub name: String,
@@ -39,22 +60,39 @@ impl Trenitalia {
             }, region_id: x[2].parse::<u8>().unwrap()}).collect();
         Trenitalia{stations: mapped_stations}
     }
-    pub fn find_journey(&self, from: &TrainStation, to: &TrainStation, when: &chrono::DateTime<chrono::Local>){
+    pub fn find_trips(&self, from: &TrainStation, to: &TrainStation, when: &chrono::DateTime<chrono::Local>) -> Vec<Vec<TrainTrip>>{
+        let mut result: Vec<Vec<TrainTrip>> = Vec::new();
         let url = format!("http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/soluzioniViaggioNew/{}/{}/{}",
             from.short_id(),
             to.short_id(),
             when.format("%FT%T")
         );
-        println!("{}", url);
         let body: mapping::JourneySearchResult = reqwest::get(url.as_str()).unwrap().json().unwrap();
-        println!("{:?}", body);
+        for soluzione in body.soluzioni {
+            let mut train_trips: Vec<TrainTrip> = Vec::new();
+            for train_trip in soluzione.vehicles {
+                let from = self.find_train_station(train_trip.origine.as_str()).expect("Inconsistency in Trenitalia naming");
+                let to = self.find_train_station(train_trip.destinazione.as_str()).expect("Inconsistency in Trenitalia naming");
+                train_trips.push(TrainTrip{
+                    from: TrainStation{id: String::from(from.id.as_str()), name: String::from(from.name.as_str()), position: from.position, region_id: from.region_id},
+                    to: TrainStation{id: String::from(to.id.as_str()), name: String::from(to.name.as_str()), position: to.position, region_id: to.region_id},
+                    // TODO Aggiungere fermate
+                    stops: vec![],
+                    train_number: train_trip.numeroTreno,
+                    // TODO parsing tipo treno
+                    train_type: TrainType::Regionale
+                });
+            }
+            result.push(train_trips);
+        }
+        result
     }
 
-    pub fn find_train_station(&self, name: String) -> Option<&TrainStation> {
+    pub fn find_train_station(&self, name: &str) -> Option<&TrainStation> {
         let mut min_diff = std::f64::MAX;
         let mut found_station = &self.stations[0];
         for station in &self.stations {
-            let diff = diff::chars(station.name.to_lowercase().as_str(), name.to_lowercase().as_str());
+            let diff = diff::chars(station.name.to_lowercase().as_str(), &name.to_lowercase());
             let mut eq = 0;
             for d in diff {
                 if let diff::Result::Both(_, _) = d {
@@ -106,8 +144,7 @@ mod tests {
         let imola = t.nearest_station((44.3533, 11.7141));
         let cesena = t.nearest_station((44.133333, 12.233333));
         //println!("{:?}, {:?}", imola, calalzo);
-        println!("{:?}", t.find_train_station(String::from("iNola")));
-        println!("{:?}", t.find_train_station(String::from("imolla")));
-        //t.find_journey(imola, calalzo, &chrono::Local::now());
+        println!("{:?}", t.find_train_station("iNola"));
+        println!("{:?}", t.find_trips(imola, calalzo, &chrono::Local::now()));
     }
 }
