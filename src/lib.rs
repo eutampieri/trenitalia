@@ -70,12 +70,14 @@ impl Trenitalia {
             to.short_id(),
             when.format("%FT%T")
         );
+        println!("{}", url);
         let body: mapping::JourneySearchResult = reqwest::get(url.as_str()).unwrap().json().unwrap();
         for soluzione in body.soluzioni {
             let mut train_trips: Vec<TrainTrip> = Vec::new();
             for train_trip in soluzione.vehicles {
-                let from = self.find_train_station(train_trip.origine.as_str()).expect("Inconsistency in Trenitalia naming");
-                let to = self.find_train_station(train_trip.destinazione.as_str()).expect("Inconsistency in Trenitalia naming");
+                let from = self.find_train_station_offline(train_trip.origine.as_str()).unwrap_or(self.find_train_station(train_trip.origine.as_str()).expect("Inconsistency in Trenitalia"));
+                println!("{}", train_trip.destinazione);
+                let to = self.find_train_station_offline(train_trip.destinazione.as_str()).unwrap_or(self.find_train_station(train_trip.destinazione.as_str()).expect("Inconsistency in Trenitalia"));
                 train_trips.push(TrainTrip{
                     from: TrainStation{id: String::from(from.id.as_str()), name: String::from(from.name.as_str()), position: from.position, region_id: from.region_id},
                     to: TrainStation{id: String::from(to.id.as_str()), name: String::from(to.name.as_str()), position: to.position, region_id: to.region_id},
@@ -92,6 +94,24 @@ impl Trenitalia {
     }
 
     pub fn find_train_station(&self, name: &str) -> Option<&TrainStation> {
+        let url = format!("http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/autocompletaStazione/{}", name);
+        let response = reqwest::get(&url).unwrap().text().unwrap();
+        let body: Vec<Vec<&str>> = response
+        .split("\n").collect::<Vec<&str>>().iter()
+        .map(|&x| x.split("|").collect::<Vec<&str>>()).collect();
+        if body.len() == 0 {
+            None
+        } else {
+            for station in &self.stations {
+                if station.id == body[0][1] {
+                    return Some(station);
+                }
+            }
+            None
+        }
+    }
+
+    pub fn find_train_station_offline(&self, name: &str) -> Option<&TrainStation> {
         let mut min_diff = std::f64::MAX;
         let mut found_station = &self.stations[0];
         for station in &self.stations {
@@ -108,7 +128,6 @@ impl Trenitalia {
                 found_station = station;
             }
         }
-        //println!("{:?}, {}", found_station, min_diff);
         if min_diff < 1.5 {Some(found_station)} else {None}
     }
 
@@ -146,8 +165,9 @@ mod tests {
         let _carnia = t.nearest_station((46.374318, 13.134141));
         let imola = t.nearest_station((44.3533, 11.7141));
         let cesena = t.nearest_station((44.133333, 12.233333));
+        let bologna = t.find_train_station("bologna");
         //println!("{:?}, {:?}", imola, calalzo);
-        println!("{:?}", t.find_train_station("iNola"));
-        println!("{:?}", t.find_trips(imola, calalzo, &chrono::Local::now()));
+        println!("{:?}", t.find_train_station_offline("iNola"));
+        println!("{:?}", t.find_trips(imola, bologna.unwrap(), &chrono::Local::now()));
     }
 }

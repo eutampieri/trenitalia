@@ -21,7 +21,7 @@ pub struct TrainTripLeg {
     pub destinazione: String,
     pub orarioPartenza: String,
     pub orarioArrivo: String,
-    pub categoria: String,
+    pub categoria: Option<String>,
     pub categoriaDescrizione: String,
     pub numeroTreno: String,
 }
