@@ -14,17 +14,18 @@ pub enum TrainType{
 pub struct TrainTripStop {
     pub station: TrainStation,
     pub platform: String,
-    pub arrival: chrono::Local,
-    pub departure: chrono::Local,
+    pub arrival: Option<chrono::DateTime<chrono::Local>>,
+    pub departure: Option<chrono::DateTime<chrono::Local>>,
+    pub expected_arrival: chrono::DateTime<chrono::Local>,
+    pub expected_departure: chrono::DateTime<chrono::Local>,
 }
 
 #[derive(Debug)]
 pub struct TrainTrip {
-    pub from: TrainStation,
-    pub to: TrainStation, 
     pub train_number: String,
     pub train_type: TrainType,
-    pub stops: Vec<TrainTripStop>,
+    pub arrival: (TrainStation, chrono::DateTime<chrono::Local>),
+    pub departure: (TrainStation, chrono::DateTime<chrono::Local>),
 }
 
 #[derive(Debug)]
@@ -70,19 +71,31 @@ impl Trenitalia {
             to.short_id(),
             when.format("%FT%T")
         );
-        println!("{}", url);
         let body: mapping::JourneySearchResult = reqwest::get(url.as_str()).unwrap().json().unwrap();
         for soluzione in body.soluzioni {
             let mut train_trips: Vec<TrainTrip> = Vec::new();
             for train_trip in soluzione.vehicles {
-                let from = self.find_train_station_offline(train_trip.origine.as_str()).unwrap_or(self.find_train_station(train_trip.origine.as_str()).expect("Inconsistency in Trenitalia"));
-                println!("{}", train_trip.destinazione);
-                let to = self.find_train_station_offline(train_trip.destinazione.as_str()).unwrap_or(self.find_train_station(train_trip.destinazione.as_str()).expect("Inconsistency in Trenitalia"));
+                let from = self.find_train_station_offline(train_trip.origine.as_str())
+                    .unwrap_or_else(|| self.find_train_station_offline(train_trip.origine.as_str()).expect("Inconsistency in Trenitalia"));
+                let to = self.find_train_station_offline(train_trip.destinazione.as_str())
+                    .unwrap_or_else(|| self.find_train_station_offline(train_trip.destinazione.as_str()).expect("Inconsistency in Trenitalia"));
                 train_trips.push(TrainTrip{
-                    from: TrainStation{id: String::from(from.id.as_str()), name: String::from(from.name.as_str()), position: from.position, region_id: from.region_id},
-                    to: TrainStation{id: String::from(to.id.as_str()), name: String::from(to.name.as_str()), position: to.position, region_id: to.region_id},
-                    // TODO Aggiungere fermate
-                    stops: vec![],
+                    departure: (TrainStation{
+                            id: String::from(&from.id),
+                            name: String::from(&from.name),
+                            position: from.position,
+                            region_id: from.region_id
+                        },
+                        chrono::Local::now(),
+                    ),
+                    arrival: (TrainStation{
+                            id: String::from(&to.id),
+                            name: String::from(&to.name),
+                            position: to.position,
+                            region_id: to.region_id
+                        },
+                        chrono::Local::now(),
+                    ),
                     train_number: train_trip.numeroTreno,
                     // TODO parsing tipo treno
                     train_type: TrainType::Regionale
@@ -94,9 +107,10 @@ impl Trenitalia {
     }
 
     pub fn find_train_station(&self, name: &str) -> Option<&TrainStation> {
+        //return Some(&self.stations[0]);
         let url = format!("http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/autocompletaStazione/{}", name);
         let response = reqwest::get(&url).unwrap().text().unwrap();
-        let body: Vec<Vec<&str>> = response
+        let body: Vec<Vec<&str>> = response.trim_end_matches('\n')
         .split("\n").collect::<Vec<&str>>().iter()
         .map(|&x| x.split("|").collect::<Vec<&str>>()).collect();
         if body.len() == 0 {
