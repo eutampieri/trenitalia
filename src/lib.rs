@@ -4,8 +4,18 @@ use drs_primitives::*;
 
 mod mapping;
 
+struct TrainTrips(Vec<TrainTrip>);
+
+impl TrainTrips{
+    pub fn get_duration(&self) -> chrono::Duration {
+        let partenza = (&self.0[0].departure.1).clone();
+        let arrivo = (&self.0[&self.0.len() - 1].arrival.1).clone();
+        arrivo.signed_duration_since(partenza)
+    }
+}
+
 // TODO Aggiungere tipi treno
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum TrainType{
     Regionale,
     RegionaleVeloce,
@@ -21,7 +31,7 @@ pub struct TrainTripStop {
     pub expected_departure: chrono::DateTime<chrono::Local>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct TrainTrip {
     pub train_number: String,
     pub train_type: TrainType,
@@ -29,7 +39,15 @@ pub struct TrainTrip {
     pub departure: (TrainStation, chrono::DateTime<chrono::Local>),
 }
 
-#[derive(Debug)]
+impl TrainTrip{
+    pub fn get_duration(&self) -> chrono::Duration {
+        let partenza = (&self.departure.1).clone();
+        let arrivo = (&self.arrival.1).clone();
+        arrivo.signed_duration_since(partenza)
+    }
+}
+
+#[derive(Debug, Clone)]
 pub struct TrainStation {
     pub name: String,
     pub id: String,
@@ -183,7 +201,11 @@ mod tests {
         let cesena = t.nearest_station((44.133333, 12.233333));
         let bologna = t.find_train_station("bologna");
         //println!("{:?}, {:?}", imola, calalzo);
-        println!("{:?}", t.find_train_station_offline("iNola"));
-        println!("{:?}", t.find_trips(imola, bologna.unwrap(), &chrono::Local::now()));
+        println!("{:?}", t.find_train_station_offline("immola"));
+        println!("{:?}", t.find_trips(imola, bologna.unwrap(), &chrono::Local::now())
+            .iter()
+            .map(|x| TrainTrips(x.to_vec()).get_duration())
+            .collect::<Vec<chrono::Duration>>()
+        );
     }
 }
