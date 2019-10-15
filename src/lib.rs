@@ -19,6 +19,10 @@ impl TrainTrips{
 pub enum TrainType{
     Regionale,
     RegionaleVeloce,
+    InterCity,
+    FrecciaRossa,
+    FrecciaArgento,
+    Unknown,
 }
 
 #[derive(Debug)]
@@ -89,6 +93,24 @@ impl Trenitalia {
             }, region_id: x[2].parse::<u8>().unwrap()}).collect();
         Trenitalia{stations: mapped_stations}
     }
+    fn match_train_type(&self, description: &str) -> TrainType{
+        let train_type = match description {
+            "RV" => TrainType::RegionaleVeloce,
+            "Regionale" => TrainType::Regionale,
+            "Frecciarossa" => TrainType::FrecciaRossa,
+            "Frecciaargento" => TrainType::FrecciaArgento,
+            "IC" => TrainType::InterCity,
+            _ => TrainType::Unknown,
+        };
+        match train_type{
+            TrainType::Unknown =>{
+                let url = format!("https://eutampieri.eu/tipi_treno.php?tipo={}", description.replace(" ", "%20"));
+                let _ = reqwest::get(url.as_str());
+            },
+            _ => {}
+        }
+        train_type
+    }
     pub fn find_trips(&self, from: &TrainStation, to: &TrainStation, when: &chrono::DateTime<chrono::Local>) -> Vec<Vec<TrainTrip>>{
         let mut result: Vec<Vec<TrainTrip>> = Vec::new();
         let url = format!("http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/soluzioniViaggioNew/{}/{}/{}",
@@ -125,8 +147,7 @@ impl Trenitalia {
                         chrono::Local.datetime_from_str(train_trip.orarioArrivo.as_str(), "%FT%T").expect("Data non valida"),
                     ),
                     train_number: train_trip.numeroTreno,
-                    // TODO parsing tipo treno
-                    train_type: TrainType::Regionale
+                    train_type: self.match_train_type(&train_trip.categoriaDescrizione)
                 });
             }
             result.push(train_trips);
