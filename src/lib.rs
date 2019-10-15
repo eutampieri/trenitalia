@@ -132,7 +132,7 @@ impl Trenitalia {
         for station in &self.stations {
             let diff = strsim::normalized_damerau_levenshtein(&station.name, name);
             if diff < min_diff {
-                min_diff = current_diff;
+                min_diff = diff;
                 found_station = station;
             }
         }
