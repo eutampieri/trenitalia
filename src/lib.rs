@@ -68,9 +68,7 @@ pub struct Trenitalia {
 impl Trenitalia {
     /// Creates a new Trenitalia instance
     pub fn new() -> Trenitalia {
-        let mut file = std::fs::File::open("stazioni_coord.tsv").unwrap();
-        let mut station_list_tsv = String::new();
-        file.read_to_string(&mut station_list_tsv).unwrap();
+        let station_list_tsv = include_str!("../stazioni_coord.tsv");
         let mut station_list = station_list_tsv.split("\n").collect::<Vec<&str>>();
         station_list.remove(0);
         station_list.remove(&station_list.len()-1);
