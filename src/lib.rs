@@ -3,6 +3,7 @@ use drs_primitives::*;
 
 mod mapping;
 
+#[derive(Debug)]
 pub struct TrainStation {
     pub name: String,
     pub id: String,
@@ -48,6 +49,31 @@ impl Trenitalia {
         let body: mapping::JourneySearchResult = reqwest::get(url.as_str()).unwrap().json().unwrap();
         println!("{:?}", body);
     }
+
+    pub fn find_train_station(&self, name: String) -> Option<&TrainStation> {
+        let mut min_diff = std::f64::MAX;
+        let mut found_station = &self.stations[0];
+        for station in &self.stations {
+            let diff = diff::chars(station.name.to_lowercase().as_str(), name.to_lowercase().as_str());
+            let mut eq = 0;
+            for d in diff {
+                if let diff::Result::Both(_, _) = d {
+                    eq = eq+1;
+                }
+            }
+            let current_diff = name.len().max(station.name.len()) as f64 / eq as f64;
+            if current_diff < min_diff {
+                min_diff = current_diff;
+                found_station = station;
+            }
+        }
+        //println!("{:?}, {}", found_station, min_diff);
+        if min_diff < 1.5 {Some(found_station)} else {None}
+    }
+
+    pub fn train_info(&self, number: String, from: String) {
+
+    }
     /// Finds the nearest station from a point
     pub fn nearest_station(&self, point: (f64,f64)) -> &TrainStation {
         let mut min_dist = std::f64::MAX;
@@ -75,9 +101,13 @@ mod tests {
     #[test]
     fn test(){
         let t = Trenitalia::new();
+        let calalzo = t.nearest_station((46.45, 12.383333));
         let _carnia = t.nearest_station((46.374318, 13.134141));
         let imola = t.nearest_station((44.3533, 11.7141));
         let cesena = t.nearest_station((44.133333, 12.233333));
-        t.find_journey(imola, cesena, &chrono::Local::now());
+        //println!("{:?}, {:?}", imola, calalzo);
+        println!("{:?}", t.find_train_station(String::from("iNola")));
+        println!("{:?}", t.find_train_station(String::from("imolla")));
+        //t.find_journey(imola, calalzo, &chrono::Local::now());
     }
 }
