@@ -4,11 +4,13 @@ use drs_primitives::*;
 mod mapping;
 
 // TODO Aggiungere tipi treno
+#[derive(Debug)]
 pub enum TrainType{
     Regionale,
     RegionaleVeloce,
 }
 
+#[derive(Debug)]
 pub struct TrainTripStop {
     pub station: TrainStation,
     pub platform: String,
@@ -16,6 +18,7 @@ pub struct TrainTripStop {
     pub departure: chrono::Local,
 }
 
+#[derive(Debug)]
 pub struct TrainTrip {
     pub from: TrainStation,
     pub to: TrainStation, 
