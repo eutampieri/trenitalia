@@ -1,3 +1,4 @@
+use chrono::prelude::*;
 use std::io::*;
 use drs_primitives::*;
 
@@ -86,7 +87,7 @@ impl Trenitalia {
                             position: from.position,
                             region_id: from.region_id
                         },
-                        chrono::Local::now(),
+                        chrono::Local.datetime_from_str(train_trip.orarioPartenza.as_str(), "%FT%T").expect("Data non valida"),
                     ),
                     arrival: (TrainStation{
                             id: String::from(&to.id),
@@ -94,7 +95,7 @@ impl Trenitalia {
                             position: to.position,
                             region_id: to.region_id
                         },
-                        chrono::Local::now(),
+                        chrono::Local.datetime_from_str(train_trip.orarioArrivo.as_str(), "%FT%T").expect("Data non valida"),
                     ),
                     train_number: train_trip.numeroTreno,
                     // TODO parsing tipo treno
@@ -129,23 +130,19 @@ impl Trenitalia {
         let mut min_diff = std::f64::MAX;
         let mut found_station = &self.stations[0];
         for station in &self.stations {
-            let diff = diff::chars(station.name.to_lowercase().as_str(), &name.to_lowercase());
-            let mut eq = 0;
-            for d in diff {
-                if let diff::Result::Both(_, _) = d {
-                    eq = eq+1;
-                }
-            }
-            let current_diff = name.len().max(station.name.len()) as f64 / eq as f64;
-            if current_diff < min_diff {
+            let diff = strsim::normalized_damerau_levenshtein(&station.name, name);
+            if diff < min_diff {
                 min_diff = current_diff;
                 found_station = station;
             }
         }
-        if min_diff < 1.5 {Some(found_station)} else {None}
+        if min_diff > 0.8 {Some(found_station)} else {None}
     }
 
     pub fn train_info(&self, number: String, from: String) {
+
+    }
+    pub fn train_info_through_station(&self, number: String, through: &TrainStation) {
 
     }
     /// Finds the nearest station from a point
