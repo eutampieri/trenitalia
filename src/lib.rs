@@ -27,8 +27,16 @@ pub struct TrainTripStop {
     pub platform: String,
     pub arrival: Option<chrono::DateTime<chrono::Local>>,
     pub departure: Option<chrono::DateTime<chrono::Local>>,
-    pub expected_arrival: chrono::DateTime<chrono::Local>,
-    pub expected_departure: chrono::DateTime<chrono::Local>,
+    pub expected_arrival: Option<chrono::DateTime<chrono::Local>>,
+    pub expected_departure: Option<chrono::DateTime<chrono::Local>>,
+}
+
+pub struct DetailedTrainTrip {
+    pub from: TrainStation,
+    pub to: TrainStation, 
+    pub train_number: String,
+    pub train_type: TrainType,
+    pub stops: Vec<TrainTripStop>,
 }
 
 #[derive(Debug, Clone)]
@@ -160,10 +168,37 @@ impl Trenitalia {
         if min_diff > 0.65 {Some(found_station)} else {None}
     }
 
-    pub fn train_info(&self, number: String, from: String) {
+    fn train_info_raw(&self, number: &str, from: &str){}
 
+    pub fn train_info(&self, number: &str, from: String) {
+        let url = format!("http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaNumeroTrenoTrenoAutocomplete/{}", number);
+        let response = reqwest::get(&url).unwrap().text().unwrap();
+        let body: Vec<Vec<&str>> = response.trim_end_matches('\n')
+        .split("\n").collect::<Vec<&str>>().iter()
+        .map(|&x| x.split("|").collect::<Vec<&str>>()).collect();
+        let train_station_of_origination: &str = match body.len() {
+            1 => body[0][1].split('-').collect::<Vec<&str>>()[1],
+            0 => {
+                unimplemented!();
+            },
+            _ => {
+                let mut station_code = "";
+                let mut min_diff = 0.0;
+                for option in body {
+                    let diff = strsim::normalized_damerau_levenshtein(
+                        &option[0].split('-').collect::<Vec<&str>>()[1].trim_start().to_lowercase(),
+                        &from.to_lowercase()
+                    );
+                    if diff < min_diff {
+                        min_diff = diff;
+                        station_code = option[1].split('-').collect::<Vec<&str>>()[1];
+                    }
+                }
+                if min_diff == 0.0 {unimplemented!()} else {station_code}
+            }
+        };
     }
-    pub fn train_info_through_station(&self, number: String, through: &TrainStation) {
+    pub fn train_info_through_station(&self, number: &str, through: &TrainStation) {
 
     }
     /// Finds the nearest station from a point
