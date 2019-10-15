@@ -99,6 +99,9 @@ impl Trenitalia {
         let body: mapping::JourneySearchResult = reqwest::get(url.as_str()).unwrap().json().unwrap();
         for soluzione in body.soluzioni {
             let mut train_trips: Vec<TrainTrip> = Vec::new();
+            if strsim::normalized_damerau_levenshtein(&soluzione.vehicles[0].origine.to_lowercase(), &from.name.to_lowercase()) < 0.1 {
+                continue;
+            }
             for train_trip in soluzione.vehicles {
                 let from = self.find_train_station_offline(train_trip.origine.as_str())
                     .unwrap_or_else(|| self.find_train_station_offline(train_trip.origine.as_str()).expect("Inconsistency in Trenitalia"));
@@ -236,13 +239,13 @@ mod tests {
         let _carnia = t.nearest_station((46.374318, 13.134141));
         let imola = t.nearest_station((44.3533, 11.7141));
         let cesena = t.nearest_station((44.133333, 12.233333));
-        let bologna = t.find_train_station("bologna");
+        let bologna = t.find_train_station("roma");
         //println!("{:?}, {:?}", imola, calalzo);
         println!("{:?}", t.find_train_station_offline("immola"));
-        println!("{:?}", t.find_trips(imola, bologna.unwrap(), &chrono::Local::now())
+        println!("{:?}", t.find_trips(imola, bologna.unwrap(), &chrono::Local::now()));/*
             .iter()
             .map(|x| TrainTrips(x.to_vec()).get_duration())
             .collect::<Vec<chrono::Duration>>()
-        );
+        );*/
     }
 }
