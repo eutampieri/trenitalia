@@ -119,6 +119,73 @@ impl Trenitalia {
         }
         train_type
     }
+    fn find_trips_lefrecce(&self, from: &TrainStation, to: &TrainStation, when: &chrono::DateTime<chrono::Local>) -> Vec<Vec<TrainTrip>>{
+        let mut result: Vec<Vec<TrainTrip>> = Vec::new();
+        let client = reqwest::Client::builder()
+            .cookie_store(true)
+            .build()
+            .unwrap();
+        let url = format!("https://www.lefrecce.it/msite/api/solutions?origin={}&destination={}&arflag=A&adate={}&atime={}&adultno=1&childno=0&direction=A&frecce=false&onlyRegional=false",
+            from.name.replace(" ", "%20"),
+            to.name.replace(" ", "%20"),
+            when.format("%d/%m/%Y"),
+            when.format("%H")
+        );
+        if cfg!(debug_assertions) {
+            println!("{}", url);
+        }
+        let body: Vec<mapping::LFSolution> = client.get(url.as_str()).send().unwrap().json().unwrap();
+        for solution in &body {
+            let mut train_trips: Vec<TrainTrip> = Vec::new();
+            let url_details = format!("https://www.lefrecce.it/msite/api/solutions/{}/standardoffers", solution.idsolution);
+            if cfg!(debug_assertions) {
+                println!("{:?}", client.get(url_details.as_str()).build());
+            }
+            let body_details: mapping::LFDetailedSolution = client.get(url_details.as_str()).send().unwrap().json().unwrap();
+            for leg in &body_details.leglist {
+                for train in &leg.segments {
+                    let train_name_exploded: Vec<&str> = train.trainidentifier.split(' ').collect();
+                    let train_number = train_name_exploded[&train_name_exploded.len()-1];
+                    let from = self.find_train_station_offline(&train.departurestation)
+                        .unwrap_or_else(|| self.find_train_station_offline(&train.departurestation)
+                        .or_else(|| {
+                            let url = format!("https://eutampieri.eu/fix_localita.php?nome={}", &train.departurestation);
+                            let _ = reqwest::get(url.as_str());
+                            None
+                        }).expect("Inconsistency in Trenitalia"));
+                    let to = self.find_train_station_offline(&train.arrivalstation)
+                        .unwrap_or_else(|| self.find_train_station_offline(&train.arrivalstation)
+                        .or_else(|| {
+                            let url = format!("https://eutampieri.eu/fix_localita.php?nome={}", &train.arrivalstation);
+                            let _ = reqwest::get(url.as_str());
+                            None
+                        }).expect("Inconsistency in Trenitalia"));
+                    train_trips.push(TrainTrip{
+                        departure: (TrainStation{
+                                id: String::from(&from.id),
+                                name: String::from(&from.name),
+                                position: from.position,
+                                region_id: from.region_id
+                            },
+                            chrono::Local.datetime_from_str(train.departuretime.as_str(), "%+").expect("Data non valida"),
+                        ),
+                        arrival: (TrainStation{
+                                id: String::from(&to.id),
+                                name: String::from(&to.name),
+                                position: to.position,
+                                region_id: to.region_id
+                            },
+                            chrono::Local.datetime_from_str(train.arrivaltime.as_str(), "%+").expect("Data non valida"),
+                        ),
+                        train_number: String::from(train_number),
+                        train_type: self.match_train_type(&train.trainacronym)
+                    });
+                }
+            }
+            result.push(train_trips);
+        }
+        result
+    }
     pub fn find_trips(&self, from: &TrainStation, to: &TrainStation, when: &chrono::DateTime<chrono::Local>) -> Vec<Vec<TrainTrip>>{
         let mut result: Vec<Vec<TrainTrip>> = Vec::new();
         let url = format!("http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/soluzioniViaggioNew/{}/{}/{}",
@@ -139,6 +206,13 @@ impl Trenitalia {
                 continue;
             }
             let mut old_to: Option<&str> = None;
+            let mut old_to_stn = TrainStation{
+                            id: String::from(&to.id),
+                            name: String::from(&to.name),
+                            position: to.position,
+                            region_id: to.region_id
+            };
+            let mut old_ts = chrono::Local.timestamp(when.timestamp(), 0);
             for train_trip in soluzione.vehicles {
                 let from = self.find_train_station_offline(train_trip.origine.as_ref().unwrap_or(&String::from("")))
                     .unwrap_or_else(|| self.find_train_station_offline(train_trip.origine.as_ref().unwrap_or(&String::from("")))
@@ -155,9 +229,17 @@ impl Trenitalia {
                         None
                     }).expect("Inconsistency in Trenitalia"));
                 if old_to.is_some() && old_to!=Some(&from.name) && cfg!(debug_assertions){
+                    println!("{:?}", self.find_trips_lefrecce(&old_to_stn, from, &old_ts));
                     println!("MISSING LEG {} - {}, {}",old_to.unwrap(), &from.name, url);
                 }
                 old_to = Some(&to.name);
+                old_to_stn = TrainStation{
+                            id: String::from(&to.id),
+                            name: String::from(&to.name),
+                            position: to.position,
+                            region_id: to.region_id
+                };
+                old_ts = chrono::Local.datetime_from_str(train_trip.orarioArrivo.as_str(), "%FT%T").expect("Data non valida");
                 train_trips.push(TrainTrip{
                     departure: (TrainStation{
                             id: String::from(&from.id),
@@ -292,7 +374,7 @@ mod tests {
         let bologna = t.find_train_station("roma");
         //println!("{:?}, {:?}", imola, calalzo);
         println!("{:?}", t.find_train_station_offline("immola"));
-        println!("{:?}", t.find_trips(imola, bologna.unwrap(), &chrono::Local::now()));/*
+        println!("{:?}", t.find_trips(imola, calalzo, &chrono::Local::now()));/*
             .iter()
             .map(|x| TrainTrips(x.to_vec()).get_duration())
             .collect::<Vec<chrono::Duration>>()

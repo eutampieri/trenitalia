@@ -56,6 +56,7 @@ pub struct LFSolution {
     pub transportMeasureList: Vec<String>,
 }
 
+#[derive(Serialize, Deserialize, Debug)]
 pub struct LFLeg {
     pub idleg: String,
     pub bookingtype: char,
@@ -70,6 +71,7 @@ pub struct LFLeg {
     pub arrivaltime: String,
 }
 
+#[derive(Serialize, Deserialize, Debug)]
 pub struct LFSegment {
     pub trainidentifier: String,
     pub trainacronym: String,
@@ -81,6 +83,7 @@ pub struct LFSegment {
     pub showseatmap: bool,
 }
 
+#[derive(Serialize, Deserialize, Debug)]
 pub struct LFDetailedSolution {
     pub idsolution: String,
     pub leglist: Vec<LFLeg>,
