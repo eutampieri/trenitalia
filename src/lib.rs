@@ -157,6 +157,7 @@ impl Trenitalia {
                 if old_to.is_some() && old_to!=Some(&from.name) && cfg!(debug_assertions){
                     println!("MISSING LEG, {}", url);
                 }
+                old_to = Some(&to.name);
                 train_trips.push(TrainTrip{
                     departure: (TrainStation{
                             id: String::from(&from.id),
