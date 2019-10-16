@@ -130,14 +130,14 @@ impl Trenitalia {
                 let from = self.find_train_station_offline(train_trip.origine.as_str())
                     .unwrap_or_else(|| self.find_train_station_offline(train_trip.origine.as_str())
                     .or_else(|| {
-                        let url = format!("https://eutampieri.eu/fix_localita.php?nome={}", train_trip.origine.to_lowercase());
+                        let url = format!("https://eutampieri.eu/fix_localita.php?nome={}", train_trip.origine);
                         let _ = reqwest::get(url.as_str());
                         None
                     }).expect("Inconsistency in Trenitalia"));
                 let to = self.find_train_station_offline(train_trip.destinazione.as_str())
                     .unwrap_or_else(|| self.find_train_station_offline(train_trip.destinazione.as_str())
                     .or_else(|| {
-                        let url = format!("https://eutampieri.eu/fix_localita.php?nome={}", train_trip.origine.to_lowercase());
+                        let url = format!("https://eutampieri.eu/fix_localita.php?nome={}", train_trip.destinazione);
                         let _ = reqwest::get(url.as_str());
                         None
                     }).expect("Inconsistency in Trenitalia"));
