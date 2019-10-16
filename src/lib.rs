@@ -191,20 +191,24 @@ impl Trenitalia {
                     let acronym = train.trainacronym.as_ref().map_or(String::from(""), |x| String::from(x.as_str()));
                     let train_name_exploded: Vec<&str> = train.trainidentifier.split(' ').collect();
                     let train_number = train_name_exploded[&train_name_exploded.len()-1];
-                    let from = self.find_train_station_offline(&train.departurestation)
-                        .unwrap_or_else(|| self.find_train_station(&train.departurestation)
-                        .or_else(|| {
+                    let from = self.get_train_station(self.lefrecce_to_id.get(&train.departurestation).or_else(|| {
                             let url = format!("https://eutampieri.eu/fix_localita.php?nome={}", &train.departurestation);
                             let _ = reqwest::get(url.as_str());
                             None
-                        }).expect("Inconsistency in Trenitalia"));
-                    let to = self.find_train_station_offline(&train.arrivalstation)
-                        .unwrap_or_else(|| self.find_train_station(&train.arrivalstation)
-                        .or_else(|| {
-                            let url = format!("https://eutampieri.eu/fix_localita.php?nome={}", &train.arrivalstation);
+                        }).expect("Inconsistency in LeFrecce station names (key not found)")).or_else(|| {
+                            let url = format!("https://eutampieri.eu/fix_localita.php?nome={}", &train.departurestation);
                             let _ = reqwest::get(url.as_str());
                             None
-                        }).expect("Inconsistency in Trenitalia"));
+                        }).expect("Inconsistency in LeFrecce->VT mapping");
+                    let to = self.get_train_station(self.lefrecce_to_id.get(&train.arrivalstation).or_else(|| {
+                            let url = format!("https://eutampieri.eu/fix_localita.php?nome={}", &train.departurestation);
+                            let _ = reqwest::get(url.as_str());
+                            None
+                        }).expect("Inconsistency in LeFrecce station names (key not found)")).or_else(|| {
+                            let url = format!("https://eutampieri.eu/fix_localita.php?nome={}", &train.departurestation);
+                            let _ = reqwest::get(url.as_str());
+                            None
+                        }).expect("Inconsistency in LeFrecce->VT mapping");
                     train_trips.push(TrainTrip{
                         departure: (TrainStation{
                                 id: String::from(&from.id),
@@ -401,6 +405,15 @@ impl Trenitalia {
             }
             None
         }
+    }
+
+    pub fn get_train_station(&self, id: &str) -> Option<&TrainStation> {
+        for station in &self.stations {
+            if &station.id == id {
+                return Some(station);
+            }
+        }
+        None
     }
 
     pub fn find_train_station_offline(&self, name: &str) -> Option<&TrainStation> {
