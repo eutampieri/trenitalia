@@ -138,6 +138,7 @@ impl Trenitalia {
             ) < 0.1 {
                 continue;
             }
+            let mut old_to: Option<&str> = None;
             for train_trip in soluzione.vehicles {
                 let from = self.find_train_station_offline(train_trip.origine.as_ref().unwrap_or(&String::from("")))
                     .unwrap_or_else(|| self.find_train_station_offline(train_trip.origine.as_ref().unwrap_or(&String::from("")))
@@ -153,6 +154,9 @@ impl Trenitalia {
                         let _ = reqwest::get(url.as_str());
                         None
                     }).expect("Inconsistency in Trenitalia"));
+                if old_to.is_some() && old_to!=Some(&from.name) && cfg!(debug_assertions){
+                    printf!("MISSING LEG");
+                }
                 train_trips.push(TrainTrip{
                     departure: (TrainStation{
                             id: String::from(&from.id),
