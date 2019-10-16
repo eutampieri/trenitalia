@@ -97,8 +97,8 @@ impl TrainStation {
 
 pub struct Trenitalia {
     stations: Vec<TrainStation>,
-    lefrecce_to_id: std::collections::HashMap<&str, &str>,
-    viaggiatreno_to_lefrecce: std::collections::HashMap<&str, &str>,
+    lefrecce_to_id: std::collections::HashMap<String, String>,
+    viaggiatreno_to_lefrecce: std::collections::HashMap<String, String>,
 }
 
 impl Trenitalia {
@@ -116,13 +116,13 @@ impl Trenitalia {
                 lon: x[4].parse::<f64>().unwrap()
             }, region_id: x[2].parse::<u8>().unwrap()}).collect();
         let vt_to_lf_tsv = include_str!("../vt_lf_map.tsv");
-        let vt_to_lf: std::collections::HashMap<&str, &str> = std::collections::HashMap::from(vt_to_lf_tsv.split("\n").collect::<Vec<&str>>()
+        let vt_to_lf: std::collections::HashMap<String, String> = std::collections::HashMap::from(vt_to_lf_tsv.split("\n").collect::<Vec<&str>>()
             .iter().map(|&x| x.split("\t").collect::<Vec<&str>>()).collect::<Vec<Vec<&str>>>()
-            .iter().map(|&x| (x[0],x[1])).collect::<Vec<(&str, &str)>>().into_iter().collect());
+            .iter().map(|x| (String::from(*&x[0]), String::from(*&x[1]))).collect::<Vec<(String, String)>>().into_iter().collect());
         let lf_to_id_tsv = include_str!("../lf_vt_map.tsv");
-        let lf_to_id: std::collections::HashMap<&str, &str> = std::collections::HashMap::from(vt_to_lf_tsv.split("\n").collect::<Vec<&str>>()
+        let lf_to_id: std::collections::HashMap<String, String> = std::collections::HashMap::from(vt_to_lf_tsv.split("\n").collect::<Vec<&str>>()
             .iter().map(|&x| x.split("\t").collect::<Vec<&str>>()).collect::<Vec<Vec<&str>>>()
-            .iter().map(|&x| (x[0],x[1])).collect::<Vec<(&str, &str)>>().into_iter().collect());
+            .iter().map(|x| (String::from(*&x[0]), String::from(*&x[1]))).collect::<Vec<(String, String)>>().into_iter().collect());
         Trenitalia{stations: mapped_stations, viaggiatreno_to_lefrecce: vt_to_lf, lefrecce_to_id: lf_to_id}
     }
     fn match_train_type(&self, description: &str) -> TrainType{
@@ -149,14 +149,26 @@ impl Trenitalia {
         train_type
     }
     fn find_trips_lefrecce(&self, from: &TrainStation, to: &TrainStation, when: &chrono::DateTime<chrono::Local>) -> Vec<Vec<TrainTrip>>{
+        let updated_from = TrainStation{
+            id: String::from(&from.id),
+            name: String::from(self.viaggiatreno_to_lefrecce.get(from.name.as_str()).unwrap()),
+            position: from.position,
+            region_id: from.region_id,
+        };
+        let updated_to = TrainStation{
+            id: String::from(&from.id),
+            name: String::from(self.viaggiatreno_to_lefrecce.get(from.name.as_str()).unwrap()),
+            position: from.position,
+            region_id: from.region_id,
+        };
         let mut result: Vec<Vec<TrainTrip>> = Vec::new();
         let client = reqwest::Client::builder()
             .cookie_store(true)
             .build()
             .unwrap();
         let url = format!("https://www.lefrecce.it/msite/api/solutions?origin={}&destination={}&arflag=A&adate={}&atime={}&adultno=1&childno=0&direction=A&frecce=false&onlyRegional=false",
-            from.name.replace(" ", "%20"),
-            to.name.replace(" ", "%20"),
+            updated_from.name.replace(" ", "%20"),
+            updated_to.name.replace(" ", "%20"),
             when.format("%d/%m/%Y"),
             when.format("%H")
         );
