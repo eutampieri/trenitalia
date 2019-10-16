@@ -139,6 +139,7 @@ impl Trenitalia {
             let mut train_trips: Vec<TrainTrip> = Vec::new();
             let url_details = format!("https://www.lefrecce.it/msite/api/solutions/{}/standardoffers", solution.idsolution);
             if cfg!(debug_assertions) {
+                println!("{}", url_details);
                 println!("{:?}", client.get(url_details.as_str()).build());
             }
             let body_details: mapping::LFDetailedSolution = client.get(url_details.as_str()).send().unwrap().json().unwrap();

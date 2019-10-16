@@ -61,7 +61,7 @@ pub struct LFLeg {
     pub idleg: String,
     pub bookingtype: char,
     pub segments: Vec<LFSegment>,
-    pub servicelist: Vec<String>,
+    pub servicelist: Vec<LFService>,
     pub gift: bool,
     pub trainidentifier: String,
     pub trainacronym: String,
@@ -69,6 +69,43 @@ pub struct LFLeg {
     pub departuretime: String,
     pub arrivalstation: String,
     pub arrivaltime: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct LFOffer {
+    pub name: String,
+    pub extraInfo: Vec<String>,
+    pub points: f64,
+    pub price: f64,
+    pub message: String,
+    pub offeridlist: Vec<LFOfferID>,
+    pub credentials: Option<String>,
+    pub available: i64,
+    pub visible: bool,
+    pub selected: bool,
+    pub specialOffers: Vec<LFOffer>,
+    pub standingPlace: bool,
+    pub seatToPay: bool,
+    pub disableSeatmapSelection: bool,
+    pub transportMeasure: Option<String>,
+    pub saleable: bool,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct LFOfferID {
+    pub xmlid: String,
+    pub price: f64,
+    pub eligible: Option<String>,
+    pub messages: Vec<String>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct LFService {
+    pub name: String,
+    pub offerlist: Vec<LFOffer>,
+    pub subservicelist: Option<Vec<LFService>>,
+    pub hasGift: bool,
+    pub minprice: f64,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
