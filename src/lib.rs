@@ -381,6 +381,9 @@ impl Trenitalia {
     pub fn find_train_station(&self, name: &str) -> Option<&TrainStation> {
         //return Some(&self.stations[0]);
         let url = format!("http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/autocompletaStazione/{}", name);
+        if cfg!(debug_assertions) {
+            println!("{}", url);
+        }
         let response = reqwest::get(&url).unwrap().text().unwrap();
         if response.len() == 0 {
             return None;
