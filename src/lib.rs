@@ -15,7 +15,7 @@ impl TrainTrips{
 }
 
 // TODO Aggiungere tipi treno
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub enum TrainType{
     Regionale,
     RegionaleVeloce,
