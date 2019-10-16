@@ -307,7 +307,7 @@ impl Trenitalia {
                         },
                         chrono::Local.datetime_from_str(train_trip.orarioArrivo.as_str(), "%FT%T").expect("Data non valida"),
                     ),
-                    train_number: train_trip.numeroTreno,
+                    train_number: String::from(train_trip.numeroTreno.as_str()),
                     train_type: self.match_train_type(&train_trip.categoriaDescrizione)
                 });
             }
