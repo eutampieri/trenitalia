@@ -185,7 +185,7 @@ impl Trenitalia {
             let body_details: mapping::LFDetailedSolution = client.get(url_details.as_str()).send().unwrap().json().unwrap();
             for leg in &body_details.leglist {
                 for train in &leg.segments {
-                    if train.trainacronym == "Same" {
+                    if train.trainacronym == String::from("Same") {
                         continue;
                     }
                     let train_name_exploded: Vec<&str> = train.trainidentifier.split(' ').collect();
