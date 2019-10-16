@@ -441,6 +441,9 @@ impl Trenitalia {
 
         for station in &self.stations {
             let diff = utils::match_strings(&station.name.to_lowercase(), &name.to_lowercase());
+            if diff == 1.0 {
+                return Some(found_station);
+            }
             if diff > min_diff {
                 min_diff = diff;
                 found_station = station;
@@ -473,6 +476,9 @@ impl Trenitalia {
                     if diff < min_diff {
                         min_diff = diff;
                         station_code = option[1].split('-').collect::<Vec<&str>>()[1];
+                    }
+                    if diff == 1.0 {
+                        break;
                     }
                 }
                 if min_diff == 0.0 {unimplemented!()} else {station_code}
