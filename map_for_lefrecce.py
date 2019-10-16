@@ -3,6 +3,11 @@ from urllib.request import urlopen
 from urllib.parse import quote_plus
 
 mapping = {}
+mapping_vt_id = {}
+
+for row in open("stazioni_coord.tsv").read().replace("\r", '').split("\n")[1:-1]:
+    data = row.split("\t")
+    mapping_vt_id[data[0]] = data[1]
 
 for row in open("vt_lf_map.tsv").read().split("\n"):
     row_vals = row.split("\t")
@@ -10,7 +15,7 @@ for row in open("vt_lf_map.tsv").read().split("\n"):
 
 base_url = "https://www.lefrecce.it/msite/api/geolocations/locations?name="
 
-stations_list = [row.split("\t")[0] for row in open("stazioni_coord.tsv").read().replace("\r", '').split("\n")[1:]]
+stations_list = [row.split("\t")[0] for row in open("stazioni_coord.tsv").read().replace("\r", '').split("\n")[1:-1]]
 
 for station in stations_list:
     print(station)
@@ -34,4 +39,4 @@ with open("vt_lf_map.tsv", 'w') as f:
     f.write('\n'.join([k+'\t'+v for k,v in mapping.items()]))
 
 with open("lf_vt_map.tsv", 'w') as f:
-    f.write('\n'.join([v+'\t'+k for k,v in mapping.items()]))
+    f.write('\n'.join([v+'\t'+mapping_vt_id[k] for k,v in mapping.items()]))
