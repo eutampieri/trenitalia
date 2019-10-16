@@ -120,7 +120,7 @@ impl Trenitalia {
             .iter().map(|&x| x.split("\t").collect::<Vec<&str>>()).collect::<Vec<Vec<&str>>>()
             .iter().map(|x| (String::from(*&x[0]), String::from(*&x[1]))).collect::<Vec<(String, String)>>().into_iter().collect());
         let lf_to_id_tsv = include_str!("../lf_vt_map.tsv");
-        let lf_to_id: std::collections::HashMap<String, String> = std::collections::HashMap::from(vt_to_lf_tsv.split("\n").collect::<Vec<&str>>()
+        let lf_to_id: std::collections::HashMap<String, String> = std::collections::HashMap::from(lf_to_id_tsv.split("\n").collect::<Vec<&str>>()
             .iter().map(|&x| x.split("\t").collect::<Vec<&str>>()).collect::<Vec<Vec<&str>>>()
             .iter().map(|x| (String::from(*&x[0]), String::from(*&x[1]))).collect::<Vec<(String, String)>>().into_iter().collect());
         Trenitalia{stations: mapped_stations, viaggiatreno_to_lefrecce: vt_to_lf, lefrecce_to_id: lf_to_id}
@@ -191,7 +191,7 @@ impl Trenitalia {
                     let acronym = train.trainacronym.as_ref().map_or(String::from(""), |x| String::from(x.as_str()));
                     let train_name_exploded: Vec<&str> = train.trainidentifier.split(' ').collect();
                     let train_number = train_name_exploded[&train_name_exploded.len()-1];
-                    let from = self.get_train_station(self.lefrecce_to_id.get(&train.departurestation).or_else(|| {
+                    let from = self.get_train_station(self.lefrecce_to_id.get(&train.departurestation.to_uppercase()).or_else(|| {
                             let url = format!("https://eutampieri.eu/fix_localita.php?nome={}", &train.departurestation);
                             let _ = reqwest::get(url.as_str());
                             None
@@ -200,7 +200,7 @@ impl Trenitalia {
                             let _ = reqwest::get(url.as_str());
                             None
                         }).expect("Inconsistency in LeFrecce->VT mapping");
-                    let to = self.get_train_station(self.lefrecce_to_id.get(&train.arrivalstation).or_else(|| {
+                    let to = self.get_train_station(self.lefrecce_to_id.get(&train.arrivalstation.to_uppercase()).or_else(|| {
                             let url = format!("https://eutampieri.eu/fix_localita.php?nome={}", &train.departurestation);
                             let _ = reqwest::get(url.as_str());
                             None
@@ -233,9 +233,9 @@ impl Trenitalia {
             }
             result.push(train_trips);
         }
-        if cfg!(debug_assertions) {
+        /*if cfg!(debug_assertions) {
             println!("{:?}", result);
-        }
+        }*/
         result
     }
     pub fn find_trips(&self, from: &TrainStation, to: &TrainStation, when: &chrono::DateTime<chrono::Local>) -> Vec<Vec<TrainTrip>>{
@@ -408,6 +408,9 @@ impl Trenitalia {
     }
 
     pub fn get_train_station(&self, id: &str) -> Option<&TrainStation> {
+        if cfg!(debug_assertions) {
+            println!("{:?}", id);
+        }
         for station in &self.stations {
             if &station.id == id {
                 return Some(station);
@@ -499,10 +502,10 @@ mod tests {
         let _carnia = t.nearest_station((46.374318, 13.134141));
         let imola = t.nearest_station((44.3533, 11.7141));
         let cesena = t.nearest_station((44.133333, 12.233333));
-        let bologna = t.find_train_station("roma");
+        let bologna = t.find_train_station("vipiteno").unwrap();
         //println!("{:?}, {:?}", imola, calalzo);
         println!("{:?}", t.find_train_station_offline("immola"));
-        println!("{:?}", t.find_trips(imola, calalzo, &chrono::Local::now()));/*
+        println!("{:?}", t.find_trips(imola, bologna, &chrono::Local::now()));/*
             .iter()
             .map(|x| TrainTrips(x.to_vec()).get_duration())
             .collect::<Vec<chrono::Duration>>()
