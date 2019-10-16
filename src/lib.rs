@@ -4,6 +4,8 @@ use drs_primitives::*;
 
 mod mapping;
 
+static WORDS_EQUALITY_THRESHOLD: f64 = 0.70;
+
 pub struct TrainTrips(Vec<TrainTrip>);
 
 mod utils {
@@ -272,17 +274,17 @@ impl Trenitalia {
             let mut train_trips: Vec<TrainTrip> = Vec::new();
             if cfg!(debug_assertions) {
                 println!("expected: {}, found: {}, delta: {}",
-                &from.name.to_lowercase(),
+                &from.name,
                 &soluzione.vehicles[0].origine.as_ref().unwrap_or(&String::from("")),
                 utils::match_strings(
                 &soluzione.vehicles[0].origine.as_ref().unwrap_or(&String::from("")).to_lowercase(),
-                &from.name.to_lowercase()
+                &from.name
             ));
             }
             if utils::match_strings(
-                &soluzione.vehicles[0].origine.as_ref().unwrap_or(&String::from("")).to_lowercase(),
-                &from.name.to_lowercase()
-            ) < 0.45 {
+                &soluzione.vehicles[0].origine.as_ref().unwrap_or(&String::from("")),
+                &from.name
+            ) < WORDS_EQUALITY_THRESHOLD {
                 let filling_to = self.find_train_station_offline(soluzione.vehicles[0].origine.as_ref().unwrap_or(&String::from("")))
                     .unwrap_or_else(|| self.find_train_station(soluzione.vehicles[0].origine.as_ref().unwrap_or(&String::from("")))
                     .or_else(|| {
@@ -290,6 +292,9 @@ impl Trenitalia {
                         let _ = reqwest::get(url.as_str());
                         None
                     }).expect("Inconsistency in Trenitalia"));
+                if cfg!(debug_assertions) {
+                    println!("filling_to = {:?}", filling_to);
+                }
                 let filling_solutions = self.find_trips_lefrecce(from, filling_to, when);
                 for filling_solution in filling_solutions.iter() {
                     if filling_solution[0].departure.1 >= chrono::Local.timestamp(when.timestamp(), 0) && filling_solution[&filling_solution.len()-1].arrival.1 <= chrono::Local.datetime_from_str(soluzione.vehicles[0].orarioPartenza.as_str(), "%FT%T").expect("Data non valida") {
@@ -373,9 +378,9 @@ impl Trenitalia {
             ));
             }
             if utils::match_strings(
-                &soluzione.vehicles[&soluzione.vehicles.len()-1].destinazione.as_ref().unwrap_or(&String::from("")).to_lowercase(),
-                &to.name.to_lowercase()
-            ) < 0.45 {
+                &soluzione.vehicles[&soluzione.vehicles.len()-1].destinazione.as_ref().unwrap_or(&String::from("")),
+                &to.name
+            ) < WORDS_EQUALITY_THRESHOLD {
                 let filling_from = self.find_train_station_offline(soluzione.vehicles[&soluzione.vehicles.len()-1].destinazione.as_ref().unwrap_or(&String::from("")))
                     .unwrap_or_else(|| self.find_train_station(soluzione.vehicles[&soluzione.vehicles.len()-1].destinazione.as_ref().unwrap_or(&String::from("")))
                     .or_else(|| {
@@ -383,6 +388,9 @@ impl Trenitalia {
                         let _ = reqwest::get(url.as_str());
                         None
                     }).expect("Inconsistency in Trenitalia"));
+                if cfg!(debug_assertions) {
+                    println!("filling_from = {:?}", filling_from);
+                }
                 let filling_solutions = self.find_trips_lefrecce(filling_from, to, when);
                 for filling_solution in filling_solutions.iter() {
                     if filling_solution[0].departure.1 >= chrono::Local.datetime_from_str(soluzione.vehicles[&soluzione.vehicles.len()-1].orarioArrivo.as_str(), "%FT%T").expect("Data non valida") {
@@ -440,16 +448,19 @@ impl Trenitalia {
         let mut found_station = &self.stations[0];
 
         for station in &self.stations {
-            let diff = utils::match_strings(&station.name.to_lowercase(), &name.to_lowercase());
+            let diff = utils::match_strings(&station.name, &name);
+            if cfg!(debug_assertions) {
+                //println!("Difference between {} and {} = {}", &station.name, &name, diff);
+            }
             if diff == 1.0 {
-                return Some(found_station);
+                return Some(station);
             }
             if diff > min_diff {
                 min_diff = diff;
                 found_station = station;
             }
         }
-        if min_diff > 0.65 {Some(found_station)} else {None}
+        if min_diff >= WORDS_EQUALITY_THRESHOLD {Some(found_station)} else {None}
     }
 
     fn train_info_raw(&self, number: &str, from: &str){}
