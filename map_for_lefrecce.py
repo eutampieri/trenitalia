@@ -6,7 +6,7 @@ mapping = {}
 
 for row in open("vt_lf_map.tsv").read().split("\n"):
     row_vals = row.split("\t")
-    mapping[row_vals[0]] = mapping[row_vals[1]]
+    mapping[row_vals[0]] = row_vals[1]
 
 base_url = "https://www.lefrecce.it/msite/api/geolocations/locations?name="
 
@@ -14,7 +14,7 @@ stations_list = [row.split("\t")[0] for row in open("stazioni_coord.tsv").read()
 
 for station in stations_list:
     print(station)
-    found = False
+    found = station in mapping
     iters = 0
     while not found:
         try:
@@ -32,3 +32,6 @@ for station in stations_list:
 
 with open("vt_lf_map.tsv", 'w') as f:
     f.write('\n'.join([k+'\t'+v for k,v in mapping.items()]))
+
+with open("lf_vt_map.tsv", 'w') as f:
+    f.write('\n'.join([v+'\t'+k for k,v in mapping.items()]))
