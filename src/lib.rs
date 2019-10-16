@@ -26,6 +26,7 @@ pub enum TrainType{
     InterCityNotte,
     EuroNight,
     EuroCity,
+    Bus,
     Unknown,
 }
 
@@ -137,6 +138,11 @@ impl Trenitalia {
             "EN" => TrainType::EuroNight,
             "EC" => TrainType::EuroCity,
             "REG" => TrainType::Regionale,
+            "Autobus" => TrainType::Bus,
+            "BUS" => TrainType::Bus,
+            "FR" => TrainType::FrecciaRossa,
+            "FA" => TrainType::FrecciaArgento,
+            "FB" => TrainType::FrecciaBianca,
             _ => TrainType::Unknown,
         };
         match train_type{
