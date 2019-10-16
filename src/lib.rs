@@ -256,7 +256,7 @@ impl Trenitalia {
                             region_id: to.region_id
             };
             let mut old_ts = chrono::Local.timestamp(when.timestamp(), 0);
-            for train_trip in soluzione.vehicles {
+            for train_trip in soluzione.vehicles.iter() {
                 let from = self.find_train_station_offline(train_trip.origine.as_ref().unwrap_or(&String::from("")))
                     .unwrap_or_else(|| self.find_train_station_offline(train_trip.origine.as_ref().unwrap_or(&String::from("")))
                     .or_else(|| {
@@ -310,6 +310,27 @@ impl Trenitalia {
                     train_number: train_trip.numeroTreno,
                     train_type: self.match_train_type(&train_trip.categoriaDescrizione)
                 });
+            }
+            if strsim::normalized_damerau_levenshtein(
+                &soluzione.vehicles[&soluzione.vehicles.len()-1].origine.as_ref().unwrap_or(&String::from("")).to_lowercase(),
+                &to.name.to_lowercase()
+            ) < 0.45 {
+                let filling_from = self.find_train_station_offline(soluzione.vehicles[&soluzione.vehicles.len()-1].destinazione.as_ref().unwrap_or(&String::from("")))
+                    .unwrap_or_else(|| self.find_train_station_offline(soluzione.vehicles[&soluzione.vehicles.len()-1].destinazione.as_ref().unwrap_or(&String::from("")))
+                    .or_else(|| {
+                        let url = format!("https://eutampieri.eu/fix_localita.php?nome={}", soluzione.vehicles[&soluzione.vehicles.len()-1].destinazione.as_ref().unwrap_or(&String::from("")));
+                        let _ = reqwest::get(url.as_str());
+                        None
+                    }).expect("Inconsistency in Trenitalia"));
+                let filling_solutions = self.find_trips_lefrecce(filling_from, to, when);
+                for filling_solution in filling_solutions.iter() {
+                    if filling_solution[0].departure.1 >= chrono::Local.datetime_from_str(soluzione.vehicles[&soluzione.vehicles.len()-1].orarioArrivo.as_str(), "%FT%T").expect("Data non valida") {
+                        for filling_train in filling_solution {
+                            train_trips.push(TrainTrip::from(filling_train));
+                        }
+                        break;
+                    }
+                }
             }
             result.push(train_trips);
         }
