@@ -29,7 +29,7 @@ pub struct VTTrainTripLeg {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct LFTrain {
     pub trainidentifier: String,
-    pub trainacronym: String,
+    pub trainacronym: Option<String>,
     pub traintype: char,
     pub pricetype: char,
 }
@@ -119,7 +119,7 @@ pub struct LFService {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct LFSegment {
     pub trainidentifier: String,
-    pub trainacronym: String,
+    pub trainacronym: Option<String>,
     pub departurestation: String,
     pub departuretime: String,
     pub arrivalstation: String,

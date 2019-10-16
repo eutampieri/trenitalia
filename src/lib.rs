@@ -185,6 +185,9 @@ impl Trenitalia {
             let body_details: mapping::LFDetailedSolution = client.get(url_details.as_str()).send().unwrap().json().unwrap();
             for leg in &body_details.leglist {
                 for train in &leg.segments {
+                    if train.trainacronym == "Same" {
+                        continue;
+                    }
                     let train_name_exploded: Vec<&str> = train.trainidentifier.split(' ').collect();
                     let train_number = train_name_exploded[&train_name_exploded.len()-1];
                     let from = self.find_train_station_offline(&train.departurestation)
