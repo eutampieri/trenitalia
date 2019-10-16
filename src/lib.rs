@@ -245,6 +245,9 @@ impl Trenitalia {
             println!("{}", url);
         }
         let body: mapping::VTJourneySearchResult = reqwest::get(url.as_str()).unwrap().json().unwrap();
+        if body.soluzioni.len() == 0{
+            return self.find_trips_lefrecce(from, to, when);
+        }
         for soluzione in body.soluzioni {
             let mut train_trips: Vec<TrainTrip> = Vec::new();
             if cfg!(debug_assertions) {
