@@ -256,7 +256,7 @@ impl Trenitalia {
                         let _ = reqwest::get(url.as_str());
                         None
                     }).expect("Inconsistency in Trenitalia"));
-                if old_to.is_some() && old_to!=Some(&from.name) && cfg!(debug_assertions){
+                if old_to.is_some() && old_to!=Some(&from.name){
                     let filling_solutions = self.find_trips_lefrecce(&old_to_stn, from, &old_ts);
                     for filling_solution in filling_solutions.iter() {
                         if filling_solution[0].departure.1 >= old_ts && filling_solution[&filling_solution.len()-1].arrival.1 <= chrono::Local.datetime_from_str(train_trip.orarioPartenza.as_str(), "%FT%T").expect("Data non valida") {
