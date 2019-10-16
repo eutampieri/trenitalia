@@ -185,9 +185,10 @@ impl Trenitalia {
             let body_details: mapping::LFDetailedSolution = client.get(url_details.as_str()).send().unwrap().json().unwrap();
             for leg in &body_details.leglist {
                 for train in &leg.segments {
-                    if train.trainacronym == String::from("Same") {
+                    if train.trainidentifier == String::from("Same") {
                         continue;
                     }
+                    let acronym = train.trainacronym.as_ref().map_or(String::from(""), |x| String::from(x.as_str()));
                     let train_name_exploded: Vec<&str> = train.trainidentifier.split(' ').collect();
                     let train_number = train_name_exploded[&train_name_exploded.len()-1];
                     let from = self.find_train_station_offline(&train.departurestation)
@@ -222,7 +223,7 @@ impl Trenitalia {
                             chrono::Local.datetime_from_str(train.arrivaltime.as_str(), "%+").expect("Data non valida"),
                         ),
                         train_number: String::from(train_number),
-                        train_type: self.match_train_type(&train.trainacronym)
+                        train_type: self.match_train_type(&acronym)
                     });
                 }
             }
