@@ -2,21 +2,21 @@
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct JourneySearchResult {
-    pub soluzioni: Vec<TrainSolution>,
+pub struct VTJourneySearchResult {
+    pub soluzioni: Vec<VTTrainSolution>,
     pub origine: String,
     pub destinazione: String,
     pub errore: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct TrainSolution {
+pub struct VTTrainSolution {
     pub durata: Option<String>,
-    pub vehicles: Vec<TrainTripLeg>,
+    pub vehicles: Vec<VTTrainTripLeg>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct TrainTripLeg {
+pub struct VTTrainTripLeg {
     pub origine: String,
     pub destinazione: String,
     pub orarioPartenza: String,
@@ -54,4 +54,35 @@ pub struct LFSolution {
     pub showSeat: bool,
     pub specialOffer: Option<f64>,
     pub transportMeasureList: Vec<String>,
+}
+
+pub struct LFLeg {
+    pub idleg: String,
+    pub bookingtype: char,
+    pub segments: Vec<LFSegment>,
+    pub servicelist: Vec<String>,
+    pub gift: bool,
+    pub trainidentifier: String,
+    pub trainacronym: String,
+    pub departurestation: String,
+    pub departuretime: String,
+    pub arrivalstation: String,
+    pub arrivaltime: String,
+}
+
+pub struct LFSegment {
+    pub trainidentifier: String,
+    pub trainacronym: String,
+    pub departurestation: String,
+    pub departuretime: String,
+    pub arrivalstation: String,
+    pub arrivaltime: String,
+    pub nodexmlid: String,
+    pub showseatmap: bool,
+}
+
+pub struct LFDetailedSolution {
+    pub idsolution: String,
+    pub leglist: Vec<LFLeg>,
+    pub extraInfo: Vec<String>,
 }

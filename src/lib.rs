@@ -122,7 +122,7 @@ impl Trenitalia {
             to.short_id(),
             when.format("%FT%T")
         );
-        let body: mapping::JourneySearchResult = reqwest::get(url.as_str()).unwrap().json().unwrap();
+        let body: mapping::VTJourneySearchResult = reqwest::get(url.as_str()).unwrap().json().unwrap();
         for soluzione in body.soluzioni {
             let mut train_trips: Vec<TrainTrip> = Vec::new();
             if strsim::normalized_damerau_levenshtein(&soluzione.vehicles[0].origine.to_lowercase(), &from.name.to_lowercase()) < 0.1 {
