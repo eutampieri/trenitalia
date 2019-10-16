@@ -17,8 +17,8 @@ pub struct VTTrainSolution {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct VTTrainTripLeg {
-    pub origine: String,
-    pub destinazione: String,
+    pub origine: Option<String>,
+    pub destinazione: Option<String>,
     pub orarioPartenza: String,
     pub orarioArrivo: String,
     pub categoria: Option<String>,
