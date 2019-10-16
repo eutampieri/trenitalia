@@ -4,7 +4,17 @@ use drs_primitives::*;
 
 mod mapping;
 
-struct TrainTrips(Vec<TrainTrip>);
+pub struct TrainTrips(Vec<TrainTrip>);
+
+mod utils {
+    pub fn match_strings(first: &str, second: &str) -> f64 {
+        if first.to_lowercase() == second.to_lowercase() {
+            1.0
+        } else {
+            strsim::normalized_damerau_levenshtein(first, second)
+        }
+    }
+}
 
 impl TrainTrips{
     pub fn get_duration(&self) -> chrono::Duration {
@@ -264,12 +274,12 @@ impl Trenitalia {
                 println!("expected: {}, found: {}, delta: {}",
                 &from.name.to_lowercase(),
                 &soluzione.vehicles[0].origine.as_ref().unwrap_or(&String::from("")),
-                strsim::normalized_damerau_levenshtein(
+                utils::match_strings(
                 &soluzione.vehicles[0].origine.as_ref().unwrap_or(&String::from("")).to_lowercase(),
                 &from.name.to_lowercase()
             ));
             }
-            if strsim::normalized_damerau_levenshtein(
+            if utils::match_strings(
                 &soluzione.vehicles[0].origine.as_ref().unwrap_or(&String::from("")).to_lowercase(),
                 &from.name.to_lowercase()
             ) < 0.45 {
@@ -357,12 +367,12 @@ impl Trenitalia {
                 println!("expected: {}, found: {}, delta: {}",
                 &to.name,
                 &soluzione.vehicles[&soluzione.vehicles.len()-1].destinazione.as_ref().unwrap_or(&String::from("")),
-                strsim::normalized_damerau_levenshtein(
+                utils::match_strings(
                 &soluzione.vehicles[&soluzione.vehicles.len()-1].destinazione.as_ref().unwrap_or(&String::from("")),
                 &to.name,
             ));
             }
-            if strsim::normalized_damerau_levenshtein(
+            if utils::match_strings(
                 &soluzione.vehicles[&soluzione.vehicles.len()-1].destinazione.as_ref().unwrap_or(&String::from("")).to_lowercase(),
                 &to.name.to_lowercase()
             ) < 0.45 {
@@ -428,13 +438,9 @@ impl Trenitalia {
     pub fn find_train_station_offline(&self, name: &str) -> Option<&TrainStation> {
         let mut min_diff = 0.0;
         let mut found_station = &self.stations[0];
+
         for station in &self.stations {
-            if station.name == name {
-                return Some(station);
-            }
-        }
-        for station in &self.stations {
-            let diff = strsim::normalized_damerau_levenshtein(&station.name.to_lowercase(), &name.to_lowercase());
+            let diff = utils::match_strings(&station.name.to_lowercase(), &name.to_lowercase());
             if diff > min_diff {
                 min_diff = diff;
                 found_station = station;
@@ -460,7 +466,7 @@ impl Trenitalia {
                 let mut station_code = "";
                 let mut min_diff = 0.0;
                 for option in body {
-                    let diff = strsim::normalized_damerau_levenshtein(
+                    let diff = utils::match_strings(
                         &option[0].split('-').collect::<Vec<&str>>()[1].trim_start().to_lowercase(),
                         &from.to_lowercase()
                     );
