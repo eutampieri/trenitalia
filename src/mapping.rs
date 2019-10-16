@@ -42,7 +42,7 @@ pub struct LFSolution {
     pub direction: String,
     pub departuretime: u64,
     pub arrivaltime: u64,
-    pub minprice: f64,
+    pub minprice: Option<f64>,
     pub optionaltext: Option<String>,
     pub duration: String,
     pub changesno: u8,
@@ -113,7 +113,7 @@ pub struct LFService {
     pub offerlist: Option<Vec<LFOffer>>,
     pub subservicelist: Option<Vec<LFSubService>>,
     pub hasGift: bool,
-    pub minprice: f64,
+    pub minprice: Option<f64>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
