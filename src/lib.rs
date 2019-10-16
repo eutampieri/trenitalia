@@ -13,7 +13,7 @@ mod utils {
         if first.to_lowercase() == second.to_lowercase() {
             1.0
         } else {
-            strsim::normalized_damerau_levenshtein(first, second)
+            strsim::normalized_damerau_levenshtein(&first.to_lowercase(), &second.to_lowercase())
         }
     }
 }
@@ -539,5 +539,30 @@ mod tests {
             .map(|x| TrainTrips(x.to_vec()).get_duration())
             .collect::<Vec<chrono::Duration>>()
         );*/
+    }
+
+    #[test]
+    fn test_bastardissimo(){
+        let t = Trenitalia::new();
+        let station_list_tsv = include_str!("../stazioni_coord.tsv");
+        let mut station_list = station_list_tsv.split("\n").collect::<Vec<&str>>();
+        station_list.remove(0);
+        station_list.remove(&station_list.len()-1);
+        let mapped_stations: Vec<super::TrainStation> = station_list.iter()
+            .map(|&x| x.split("\t").collect::<Vec<&str>>())
+            .collect::<Vec<Vec<&str>>>().iter()
+            .map(|x|  super::TrainStation{id: String::from(x[1]), name: String::from(x[0]), position: Coord{
+                lat: x[3].parse::<f64>().unwrap(),
+                lon: x[4].parse::<f64>().unwrap()
+            }, region_id: x[2].parse::<u8>().unwrap()}).collect();
+        for from in &mapped_stations {
+            for to in &mapped_stations {
+                if from.id == to.id {
+                    continue;
+                }
+                let res = t.find_trips(from, to, &chrono::Local::now());
+                drop(res);
+            }
+        }
     }
 }
