@@ -230,8 +230,22 @@ impl Trenitalia {
             if strsim::normalized_damerau_levenshtein(
                 &soluzione.vehicles[0].origine.as_ref().unwrap_or(&String::from("")).to_lowercase(),
                 &from.name.to_lowercase()
-            ) < 0.1 {
-                continue;
+            ) < 0.45 {
+                let filling_to = self.find_train_station_offline(soluzione.vehicles[0].origine.as_ref().unwrap_or(&String::from("")))
+                    .unwrap_or_else(|| self.find_train_station_offline(soluzione.vehicles[0].origine.as_ref().unwrap_or(&String::from("")))
+                    .or_else(|| {
+                        let url = format!("https://eutampieri.eu/fix_localita.php?nome={}", soluzione.vehicles[0].origine.as_ref().unwrap_or(&String::from("")));
+                        let _ = reqwest::get(url.as_str());
+                        None
+                    }).expect("Inconsistency in Trenitalia"));
+                let filling_solutions = self.find_trips_lefrecce(from, filling_to, when);
+                for filling_solution in filling_solutions.iter() {
+                    if filling_solution[0].departure.1 >= chrono::Local.timestamp(when.timestamp(), 0) && filling_solution[&filling_solution.len()-1].arrival.1 <= chrono::Local.datetime_from_str(soluzione.vehicles[0].orarioPartenza.as_str(), "%FT%T").expect("Data non valida") {
+                        for filling_train in filling_solution {
+                            train_trips.push(TrainTrip::from(filling_train));
+                        }
+                    }
+                }
             }
             let mut old_to: Option<&str> = None;
             let mut old_to_stn = TrainStation{
