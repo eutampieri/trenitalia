@@ -244,6 +244,7 @@ impl Trenitalia {
                         for filling_train in filling_solution {
                             train_trips.push(TrainTrip::from(filling_train));
                         }
+                        break;
                     }
                 }
             }
@@ -277,6 +278,7 @@ impl Trenitalia {
                             for filling_train in filling_solution {
                                 train_trips.push(TrainTrip::from(filling_train));
                             }
+                            break;
                         }
                     }
                 }
