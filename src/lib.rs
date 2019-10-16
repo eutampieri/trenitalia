@@ -122,6 +122,9 @@ impl Trenitalia {
             to.short_id(),
             when.format("%FT%T")
         );
+        if cfg!(debug_assertions) {
+            println!("{}", url);
+        }
         let body: mapping::VTJourneySearchResult = reqwest::get(url.as_str()).unwrap().json().unwrap();
         for soluzione in body.soluzioni {
             let mut train_trips: Vec<TrainTrip> = Vec::new();
