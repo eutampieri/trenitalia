@@ -311,8 +311,17 @@ impl Trenitalia {
                     train_type: self.match_train_type(&train_trip.categoriaDescrizione)
                 });
             }
+            if cfg!(debug_assertions) {
+                println!("expected: {}, found: {}, delta: {}",
+                &to.name,
+                &soluzione.vehicles[&soluzione.vehicles.len()-1].destinazione.as_ref().unwrap_or(&String::from("")),
+                strsim::normalized_damerau_levenshtein(
+                &soluzione.vehicles[&soluzione.vehicles.len()-1].destinazione.as_ref().unwrap_or(&String::from("")),
+                &to.name,
+            ));
+            }
             if strsim::normalized_damerau_levenshtein(
-                &soluzione.vehicles[&soluzione.vehicles.len()-1].origine.as_ref().unwrap_or(&String::from("")).to_lowercase(),
+                &soluzione.vehicles[&soluzione.vehicles.len()-1].destinazione.as_ref().unwrap_or(&String::from("")).to_lowercase(),
                 &to.name.to_lowercase()
             ) < 0.45 {
                 let filling_from = self.find_train_station_offline(soluzione.vehicles[&soluzione.vehicles.len()-1].destinazione.as_ref().unwrap_or(&String::from("")))
