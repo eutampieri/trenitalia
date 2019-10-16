@@ -155,7 +155,7 @@ impl Trenitalia {
                         None
                     }).expect("Inconsistency in Trenitalia"));
                 if old_to.is_some() && old_to!=Some(&from.name) && cfg!(debug_assertions){
-                    printf!("MISSING LEG");
+                    println!("MISSING LEG, {}", url);
                 }
                 train_trips.push(TrainTrip{
                     departure: (TrainStation{
