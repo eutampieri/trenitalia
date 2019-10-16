@@ -23,6 +23,7 @@ pub enum TrainType{
     FrecciaRossa,
     FrecciaArgento,
     FrecciaBianca,
+    InterCityNotte,
     Unknown,
 }
 
@@ -102,6 +103,7 @@ impl Trenitalia {
             "Frecciaargento" => TrainType::FrecciaArgento,
             "IC" => TrainType::InterCity,
             "Frecciabianca" => TrainType::FrecciaBianca,
+            "ICN" => TrainType::InterCityNotte,
             _ => TrainType::Unknown,
         };
         match train_type{
