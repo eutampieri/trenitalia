@@ -61,6 +61,24 @@ impl TrainTrip{
         let arrivo = (&self.arrival.1).clone();
         arrivo.signed_duration_since(partenza)
     }
+    pub fn from(reference: &TrainTrip) -> Self {
+        TrainTrip{
+            train_number: String::from(reference.train_number.as_str()),
+            train_type: reference.train_type,
+            arrival: (TrainStation{
+                name: String::from(reference.arrival.0.name.as_str()),
+                id: String::from(reference.arrival.0.id.as_str()),
+                region_id: reference.arrival.0.region_id,
+                position: reference.arrival.0.position,
+                }, reference.arrival.1),
+            departure: (TrainStation{
+                name: String::from(reference.departure.0.name.as_str()),
+                id: String::from(reference.departure.0.id.as_str()),
+                region_id: reference.departure.0.region_id,
+                position: reference.departure.0.position,
+                }, reference.departure.1),
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -108,6 +126,7 @@ impl Trenitalia {
             "ICN" => TrainType::InterCityNotte,
             "EN" => TrainType::EuroNight,
             "EC" => TrainType::EuroCity,
+            "REG" => TrainType::Regionale,
             _ => TrainType::Unknown,
         };
         match train_type{
@@ -140,7 +159,6 @@ impl Trenitalia {
             let url_details = format!("https://www.lefrecce.it/msite/api/solutions/{}/standardoffers", solution.idsolution);
             if cfg!(debug_assertions) {
                 println!("{}", url_details);
-                println!("{:?}", client.get(url_details.as_str()).build());
             }
             let body_details: mapping::LFDetailedSolution = client.get(url_details.as_str()).send().unwrap().json().unwrap();
             for leg in &body_details.leglist {
@@ -200,6 +218,15 @@ impl Trenitalia {
         let body: mapping::VTJourneySearchResult = reqwest::get(url.as_str()).unwrap().json().unwrap();
         for soluzione in body.soluzioni {
             let mut train_trips: Vec<TrainTrip> = Vec::new();
+            if cfg!(debug_assertions) {
+                println!("expected: {}, found: {}, delta: {}",
+                &from.name.to_lowercase(),
+                &soluzione.vehicles[0].origine.as_ref().unwrap_or(&String::from("")),
+                strsim::normalized_damerau_levenshtein(
+                &soluzione.vehicles[0].origine.as_ref().unwrap_or(&String::from("")).to_lowercase(),
+                &from.name.to_lowercase()
+            ));
+            }
             if strsim::normalized_damerau_levenshtein(
                 &soluzione.vehicles[0].origine.as_ref().unwrap_or(&String::from("")).to_lowercase(),
                 &from.name.to_lowercase()
@@ -230,8 +257,14 @@ impl Trenitalia {
                         None
                     }).expect("Inconsistency in Trenitalia"));
                 if old_to.is_some() && old_to!=Some(&from.name) && cfg!(debug_assertions){
-                    println!("{:?}", self.find_trips_lefrecce(&old_to_stn, from, &old_ts));
-                    println!("MISSING LEG {} - {}, {}",old_to.unwrap(), &from.name, url);
+                    let filling_solutions = self.find_trips_lefrecce(&old_to_stn, from, &old_ts);
+                    for filling_solution in filling_solutions.iter() {
+                        if filling_solution[0].departure.1 >= old_ts && filling_solution[&filling_solution.len()-1].arrival.1 <= chrono::Local.datetime_from_str(train_trip.orarioPartenza.as_str(), "%FT%T").expect("Data non valida") {
+                            for filling_train in filling_solution {
+                                train_trips.push(TrainTrip::from(filling_train));
+                            }
+                        }
+                    }
                 }
                 old_to = Some(&to.name);
                 old_to_stn = TrainStation{

@@ -84,7 +84,7 @@ pub struct LFOffer {
     pub visible: bool,
     pub selected: bool,
     pub specialOffers: Vec<LFOffer>,
-    pub standingPlace: bool,
+    //pub standingPlace: bool,
     pub seatToPay: bool,
     pub disableSeatmapSelection: bool,
     pub transportMeasure: Option<String>,
@@ -100,10 +100,18 @@ pub struct LFOfferID {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct LFService {
+pub struct LFSubService {
     pub name: String,
     pub offerlist: Vec<LFOffer>,
-    pub subservicelist: Option<Vec<LFService>>,
+    pub hasGift: bool,
+    pub minprice: Option<f64>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct LFService {
+    pub name: String,
+    pub offerlist: Option<Vec<LFOffer>>,
+    pub subservicelist: Option<Vec<LFSubService>>,
     pub hasGift: bool,
     pub minprice: f64,
 }
