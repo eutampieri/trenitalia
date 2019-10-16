@@ -128,21 +128,24 @@ impl Trenitalia {
         let body: mapping::VTJourneySearchResult = reqwest::get(url.as_str()).unwrap().json().unwrap();
         for soluzione in body.soluzioni {
             let mut train_trips: Vec<TrainTrip> = Vec::new();
-            if strsim::normalized_damerau_levenshtein(&soluzione.vehicles[0].origine.to_lowercase(), &from.name.to_lowercase()) < 0.1 {
+            if strsim::normalized_damerau_levenshtein(
+                &soluzione.vehicles[0].origine.as_ref().unwrap_or(&String::from("")).to_lowercase(),
+                &from.name.to_lowercase()
+            ) < 0.1 {
                 continue;
             }
             for train_trip in soluzione.vehicles {
-                let from = self.find_train_station_offline(train_trip.origine.as_str())
-                    .unwrap_or_else(|| self.find_train_station_offline(train_trip.origine.as_str())
+                let from = self.find_train_station_offline(train_trip.origine.as_ref().unwrap_or(&String::from("")))
+                    .unwrap_or_else(|| self.find_train_station_offline(train_trip.origine.as_ref().unwrap_or(&String::from("")))
                     .or_else(|| {
-                        let url = format!("https://eutampieri.eu/fix_localita.php?nome={}", train_trip.origine);
+                        let url = format!("https://eutampieri.eu/fix_localita.php?nome={}", train_trip.origine.as_ref().unwrap_or(&String::from("")));
                         let _ = reqwest::get(url.as_str());
                         None
                     }).expect("Inconsistency in Trenitalia"));
-                let to = self.find_train_station_offline(train_trip.destinazione.as_str())
-                    .unwrap_or_else(|| self.find_train_station_offline(train_trip.destinazione.as_str())
+                let to = self.find_train_station_offline(train_trip.destinazione.as_ref().unwrap_or(&String::from("")))
+                    .unwrap_or_else(|| self.find_train_station_offline(train_trip.destinazione.as_ref().unwrap_or(&String::from("")))
                     .or_else(|| {
-                        let url = format!("https://eutampieri.eu/fix_localita.php?nome={}", train_trip.destinazione);
+                        let url = format!("https://eutampieri.eu/fix_localita.php?nome={}", train_trip.destinazione.as_ref().unwrap_or(&String::from("")));
                         let _ = reqwest::get(url.as_str());
                         None
                     }).expect("Inconsistency in Trenitalia"));
