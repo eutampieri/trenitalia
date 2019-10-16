@@ -96,7 +96,9 @@ impl TrainStation {
 }
 
 pub struct Trenitalia {
-    stations: Vec<TrainStation>
+    stations: Vec<TrainStation>,
+    lefrecce_to_id: std::collections::HashMap<&str, &str>,
+    viaggiatreno_to_lefrecce: std::collections::HashMap<&str, &str>,
 }
 
 impl Trenitalia {
@@ -113,7 +115,15 @@ impl Trenitalia {
                 lat: x[3].parse::<f64>().unwrap(),
                 lon: x[4].parse::<f64>().unwrap()
             }, region_id: x[2].parse::<u8>().unwrap()}).collect();
-        Trenitalia{stations: mapped_stations}
+        let vt_to_lf_tsv = include_str!("../vt_lf_map.tsv");
+        let vt_to_lf: std::collections::HashMap<&str, &str> = std::collections::HashMap::from(vt_to_lf_tsv.split("\n").collect::<Vec<&str>>()
+            .iter().map(|&x| x.split("\t").collect::<Vec<&str>>()).collect::<Vec<Vec<&str>>>()
+            .iter().map(|&x| (x[0],x[1])).collect::<Vec<(&str, &str)>>().into_iter().collect());
+        let lf_to_id_tsv = include_str!("../lf_vt_map.tsv");
+        let lf_to_id: std::collections::HashMap<&str, &str> = std::collections::HashMap::from(vt_to_lf_tsv.split("\n").collect::<Vec<&str>>()
+            .iter().map(|&x| x.split("\t").collect::<Vec<&str>>()).collect::<Vec<Vec<&str>>>()
+            .iter().map(|&x| (x[0],x[1])).collect::<Vec<(&str, &str)>>().into_iter().collect());
+        Trenitalia{stations: mapped_stations, viaggiatreno_to_lefrecce: vt_to_lf, lefrecce_to_id: lf_to_id}
     }
     fn match_train_type(&self, description: &str) -> TrainType{
         let train_type = match description {
