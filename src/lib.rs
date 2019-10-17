@@ -167,6 +167,9 @@ impl Trenitalia {
         train_type
     }
     fn find_trips_lefrecce(&self, from: &TrainStation, to: &TrainStation, when: &chrono::DateTime<chrono::Local>) -> Vec<Vec<TrainTrip>>{
+        if from.id == to.id {
+            return vec![];
+        }
         let updated_from = TrainStation{
             id: String::from(&from.id),
             name: String::from(self.viaggiatreno_to_lefrecce.get(from.name.as_str()).unwrap()),

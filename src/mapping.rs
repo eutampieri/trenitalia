@@ -88,7 +88,7 @@ pub struct LFOffer {
     pub price: f64,
     pub message: String,
     pub offeridlist: Vec<LFOfferID>,
-    pub credentials: Option<Vec<LFCredential>>,
+    //pub credentials: Option<Vec<LFCredential>>,
     pub available: i64,
     pub visible: bool,
     pub selected: bool,
