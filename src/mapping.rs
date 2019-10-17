@@ -70,6 +70,15 @@ pub struct LFLeg {
     pub arrivalstation: String,
     pub arrivaltime: String,
 }
+#[derive(Serialize, Deserialize, Debug)]
+pub struct LFCredential {
+    pub credentialid: u16,
+    pub format: u8,
+    pub name: String,
+    pub description: String,
+    pub possiblevalues: String,
+    pub typeCredential: char,
+}
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct LFOffer {
@@ -79,7 +88,7 @@ pub struct LFOffer {
     pub price: f64,
     pub message: String,
     pub offeridlist: Vec<LFOfferID>,
-    pub credentials: Option<String>,
+    pub credentials: Option<Vec<LFCredential>>,
     pub available: i64,
     pub visible: bool,
     pub selected: bool,
