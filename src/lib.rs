@@ -543,6 +543,7 @@ mod tests {
 
     #[test]
     fn test_bastardissimo(){
+        let class = std::env::var("CLASS_BASTARDA").unwrap().parse::<usize>().unwrap();
         let t = Trenitalia::new();
         let station_list_tsv = include_str!("../stazioni_coord.tsv");
         let mut station_list = station_list_tsv.split("\n").collect::<Vec<&str>>();
@@ -555,7 +556,10 @@ mod tests {
                 lat: x[3].parse::<f64>().unwrap(),
                 lon: x[4].parse::<f64>().unwrap()
             }, region_id: x[2].parse::<u8>().unwrap()}).collect();
-        for from in &mapped_stations {
+        let start = mapped_stations.len()as f64*(class-1)as f64/100.0;
+        let end = mapped_stations.len()as f64*class as f64/100.0;
+        for i in start as usize..end as usize {
+            let from = &mapped_stations[i];
             for to in &mapped_stations {
                 if from.id == to.id {
                     continue;
