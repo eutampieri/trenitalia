@@ -10,7 +10,7 @@ Acqua Acetosa	ACQUA ACETOSA
 Acquafredda	ACQUAFREDDA
 Acquanegra Cremonese	ACQUANEGRA CREMONESE
 Acquappesa	ACQUAPPESA
-Acquaviva	ACQUAVIVA DELLE FONTI
+Acquaviva	ACQUAVIVA-CASTELTERMINI
 Acquaviva Delle Fonti	ACQUAVIVA DELLE FONTI
 Acquedolci-S.Fratello	ACQUEDOLCI-S.FRATELLO
 Acqui Terme	ACQUI TERME
@@ -38,7 +38,7 @@ Albano S.Alessandro	ALBANO S. ALESSANDRO
 Albanova	ALBANOVA
 Albaredo	ALBAREDO
 Albate Camerlata	ALBATE-CAMERLATA
-Albate-Trecallo	ALBATE-CAMERLATA
+Albate-Trecallo	ALBATE TRECALLO
 Albenga	ALBENGA
 Alberese	ALBERESE
 Albinia	ALBINIA
@@ -139,7 +139,7 @@ Avio	AVIO
 Avise	AVISE
 Avola	AVOLA
 Bari Centrale	BARI CENTRALE
-Bari C.le	BARI CEGLIE-CARBONARA
+Bari C.le	BARI CENTRALE
 Bologna Centrale	BOLOGNA CENTRALE
 Bologna C.le	BOLOGNA CENTRALE
 Badia Polesine	BADIA POLESINE
@@ -165,7 +165,7 @@ Baragiano	BARAGIANO-RUOTI
 Baranello	BARANELLO
 Barbianello	BARBIANELLO
 Barbiano	BARBIANO
-Barbusi	BARBADILLO Y CALZADA (APT.-CGD
+Barbusi	
 Barcellona	BARCELLONA-CASTROREALE
 Bardonecchia	BARDONECCHIA
 Barga Gallicano	BARGA-GALLICANO
@@ -231,7 +231,7 @@ Bicocca	BICOCCA
 Biella Chiavazza	BIELLA-CHIAVAZZA
 Biella S.Paolo	BIELLA S. PAOLO
 Biforco	BIFORCO
-Binario S.Marco Vecchio	BINAU
+Binario S.Marco Vecchio	FIRENZE S. MARCO VECCHIO
 Bisceglie	BISCEGLIE
 Bistagno	BISTAGNO
 Bisuschio Viggiu	BISUSCHIO-VIGGIU'
@@ -247,8 +247,8 @@ Bologna C.le/Av	BOLOGNA CENTRALE
 Bologna Corticella	BOLOGNA CORTICELLA
 Bologna Fiere	BOLOGNA FICO-EW
 Bologna Mazzini	BOLOGNA MAZZINI
-Bologna Ravone	BOLOGNA RIMESSE
-Bologna S.Ruffillo	BOLOGNA S. RITA
+Bologna Ravone	
+Bologna S.Ruffillo	BOLOGNA S. RUFFILLO
 Bolzano 	BOLZANO BOZEN
 Bolzano Novarese	BOLZANO NOVARESE
 Bolzano Sud 	BOLZANO SUD BOZEN SUD
@@ -257,7 +257,7 @@ Bonefro S.Croce	BONEFRO-S. CROCE
 Bonferraro	BONFERRARO
 Bonorva	BONORVA
 Bordighera	BORDIGHERA
-Borghetto	BORGHETTO PARMENSE
+Borghetto	BORGHETTO SULL'ADIGE
 Borghetto Parmense	BORGHETTO PARMENSE
 Borghetto Santo Spirito	BORGHETTO S. SPIRITO
 Borgio Verezzi	BORGIO-VEREZZI
@@ -268,8 +268,8 @@ Borgo Fornari Per Voltaggio	BORGO FORNARI PER VOLTAGGIO
 Borgo Lavezzaro	BORGO LAVEZZARO
 Borgo Revel	BORGO REVEL
 Borgo S. Lorenzo	BORGO S. LORENZO
-Borgo S.L.Rimorelli	BORGO S. DALMAZZO
-Borgo S.Martino	BORGO S. DALMAZZO
+Borgo S.L.Rimorelli	BORGO S. LORENZO-RIMORELLI
+Borgo S.Martino	BORGO S. MARTINO
 Borgo San Dalmazzo	BORGO S. DALMAZZO
 Borgo Ticino	BORGO TICINO
 Borgo Val Di Taro	BORGO VAL DI TARO
@@ -278,7 +278,7 @@ Borgo Valsugana Est	BORGO VALSUGANA EST
 Borgo Vercelli	BORGO VERCELLI
 Borgoforte	BORGOFORTE
 Borgofranco	BORGOFRANCO
-Borgolombardo	BORGO
+Borgolombardo	BORGO LOMBARDO
 Borgomanero	BORGOMANERO
 Borgone	BORGONE
 Borgoratto	BORGORATTO
@@ -375,7 +375,7 @@ Campello	CAMPELLO SUL CLITUNNO
 Campiglia Marittima	CAMPIGLIA MARITTIMA
 Campo Di Carne	CAMPO DI CARNE
 Campo Di Giove	CAMPO DI GIOVE
-Campo Di Giove-Monte Maiella	CAMPO DI GIOVE
+Campo Di Giove-Monte Maiella	CAMPO DI GIOVE MONTE MAIELLA
 Campo Di Nusco	CAMPO DI NUSCO
 Campo Di Trens 	CAMPO DI TRENS FREIENFELD
 Campobasso	CAMPOBASSO
@@ -387,7 +387,7 @@ Campofranco	CAMPOFRANCO
 Campolattaro	CAMPOLATTARO
 Campoleone	CAMPOLEONE
 Campolieto Monacilioni	CAMPOLIETO-MONACILIONE
-Campoligure Masone	CAMPOLIDE
+Campoligure Masone	CAMPO LIGURE-MASONE
 Campomaggiore	CAMPOMAGGIORE-PIETRAPERTOSA
 Campomarino	CAMPOMARINO
 Campomela	CAMPOMELA
@@ -506,9 +506,9 @@ Castel Gandolfo	CASTEL GANDOLFO
 Castel Lagopesole	CASTEL LAGOPESOLE
 Castel Madama	CASTEL MADAMA
 Castel S.Angelo	CASTEL S. ANGELO
-Castel S.Giorgio Roccapiemonte	CASTEL S. ANGELO
-Castel S.Giovanni	CASTEL S. ANGELO
-Castel S.Pietro Terme	CASTEL S. ANGELO
+Castel S.Giorgio Roccapiemonte	CASTEL S. GIORGIO-ROCCAPIEMONTE
+Castel S.Giovanni	CASTEL S. GIOVANNI
+Castel S.Pietro Terme	CASTEL S. PIETRO TERME
 Castelbello	CASTELBELLO KASTELBELL
 Castelbolognese	CASTELBOLOGNESE-RIOLO TERME
 Castelbuono	CASTELBUONO
@@ -536,7 +536,7 @@ Castello Di Godego	CASTELLO DI GODEGO
 Castello D`Annone	CASTELLO D'ANNONE
 Castellucchio	CASTELLUCCHIO
 Castell`Alfero	CASTELL'ALFERO
-Castelmaggiore	PONTELAMBRO-CASTELMARTE
+Castelmaggiore	CASTEL MAGGIORE
 Castelnuovo	CASTELNUOVO BELBO
 Castelnuovo Belbo	CASTELNUOVO BELBO
 Castelnuovo Berardenga	CASTELNUOVO BERARDENGA
@@ -549,7 +549,7 @@ Castelvecchio Pascoli	CASTELVECCHIO PASCOLI
 Castelvetere	CASTELVETERE
 Castelvetrano	CASTELVETRANO
 Castelvetro	CASTELVETRO
-Castiglion Del Lago	CASTIGLION FIBOCCHI
+Castiglion Del Lago	CASTIGLIONE DEL LAGO
 Castiglion Fiorentino	CASTIGLION FIORENTINO
 Castiglioncello	CASTIGLIONCELLO
 Castiglione Cosentino	CASTIGLIONE COSENTINO
@@ -609,7 +609,7 @@ Cervaro	CERVARO
 Cervia-Milano Marittima	CERVIA-MILANO MARITTIMA
 Cervignano A.G.	CERVIGNANO-AQUILEIA-GRADO
 Cervignasco	CERVIGNASCO
-Cervo San Bartolomeo	CERVARO
+Cervo San Bartolomeo	
 Cesano Di Roma	CESANO DI ROMA
 Cese	CESE
 Cesena	CESENA
@@ -657,11 +657,11 @@ Civita Castellana	CIVITA CASTELLANA-MAGLIANO
 Civita D`Antino-Morino	CIVITA D'ANTINO-MORINO
 Civitanova Marche	CIVITANOVA MARCHE-MONTEGRANARO
 Civitavecchia	CIVITAVECCHIA
-Civitavecchia M.Ma	CIVITAVECCHIA ( TUTTE LE STAZIONI )
+Civitavecchia M.Ma	CIVITAVECCHIA PORTO
 Civitavecchia Viale Della Vittoria	CIVITAVECCHIA VIALE DELLA VITTORIA
 Civitella Paganico	CIVITELLA-PAGANICO
 Civitella Roveto	CIVITELLA ROVETO
-Cixerri	CIAMPINO
+Cixerri	
 Classe	CLASSE
 Coccaglio	COCCAGLIO
 Cocconato	COCCONATO
@@ -748,7 +748,7 @@ Dervio	DERVIO
 Desenzano	DESENZANO DEL GARDA-SIRMIONE
 Desio	DESIO
 Diamante Buonvicino	DIAMANTE-BUONVICINO
-Diano Marina	DIANO
+Diano Marina	
 Dicomano	DICOMANO
 Diecimo - Pescaglia	DIECIMO-PESCAGLIA
 Dittaino	DITTAINO
@@ -766,7 +766,7 @@ Dossobuono	DOSSOBUONO
 Dronero	DRONERO
 Dubino	DUBINO
 Dueville	DUEVILLE
-Dev.Int. Dd/Av	DEVA
+Dev.Int. Dd/Av	
 Eboli	EBOLI
 Eca Nasago`	ECA NASAGO
 Eccellente	ECCELLENTE
@@ -814,10 +814,10 @@ Ferrania	FERRANIA
 Ferrara	FERRARA
 Ferrera Lomellina	FERRERA LOMELLINA
 Ferruzzano	FERRUZZANO
-Fi Rovezzano	FIAIS DA TELHA
+Fi Rovezzano	FIRENZE ROVEZZANO
 Fidene	FIDENE
 Fidenza	FIDENZA
-Fiera	FIERA DI ROMA
+Fiera	PALERMO FIERA
 Fiesole Caldine	FIESOLE-CALDINE
 Figline Valdarno	FIGLINE VALDARNO
 Filattiera	FILATTIERA
@@ -831,7 +831,7 @@ Firenze Rifredi	FIRENZE RIFREDI
 Firenze Statuto	FIRENZE STATUTO
 Fisciano	FISCIANO
 Fiumefreddo Bruzio	FIUMEFREDDO BRUZIO
-Fiumefreddo Di Sicilia	FIUMEFREDDO BRUZIO
+Fiumefreddo Di Sicilia	FIUMEFREDDO SICILIA
 Fiumelatte	FIUMELATTE
 Fiumetorto	FIUMETORTO
 Fiumicino Aeroporto	FIUMICINO AEROPORTO
@@ -859,16 +859,16 @@ Fosciandora - Ceserana	FOSCIANDORA-CESERANA
 Fossacesia	FOSSACESIA-TORINO DI SANGRO
 Fossacesia - Torino Di Sangro	FOSSACESIA-TORINO DI SANGRO
 Fossalta Di Piave	FOSSALTA DI PIAVE
-Fossalta Di Portogruaro	FOSSALTA DI PIAVE
+Fossalta Di Portogruaro	
 Fossano	FOSSANO
 Fossato Di Vico Gubbio	FOSSATO DI VICO-GUBBIO
 Fragneto Monforte	FRAGNETO MONFORTE
 Framura	FRAMURA
-Francavilla	FRANCAVILLA AL MARE
+Francavilla	FRANCAVILLA DI SICILIA
 Francavilla Al Mare	FRANCAVILLA AL MARE
 Francavilla Angitola F.	FRANCAVILLA ANGITOLA-FILADELFIA
 Francavilla Fontana	FRANCAVILLA FONTANA
-Francia	BARCELONA-FRANCIA
+Francia	PALERMO FRANCIA
 Frascati	FRASCATI
 Frasso T. Dugenta	FRASSO TELESINO-DUGENTA
 Fratta	FRATTA
@@ -882,11 +882,11 @@ Frugarolo Boscomarengo	FRUGAROLO-BOSCOMARENGO
 Funo Centergross	FUNO CENTERGROSS
 Furci	FURCI
 Fuscaldo	FUSCALDO
-Genova P.Principe	GENOVA PEGLI
+Genova P.Principe	GENOVA PIAZZA PRINCIPE
 Gabella Grande	GABELLA GRANDE
 Gaggi	GAGGI
 Gaggiano	GAGGIANO
-Gaggio	GAGGIO PORTA EST
+Gaggio	
 Gagliole	GAGLIOLE
 Gaibanella	GAIBANELLA
 Gaifana	GAIFANA
@@ -922,7 +922,7 @@ Genova Costa Di Sestri Ponente	GENOVA COSTA DI SESTRI PONENTE
 Genova Granara	GENOVA GRANARA
 Genova Marittima S. Limbania	GENOVA MARITTIMA
 Genova Nervi	GENOVA NERVI
-Genova P. Principe Sotterranea	GENOVA PEGLI
+Genova P. Principe Sotterranea	GENOVA PIAZZA PRINCIPE
 Genova Pegli	GENOVA PEGLI
 Genova Pontedecimo	GENOVA PONTEDECIMO
 Genova Pra	GENOVA PRA
@@ -949,7 +949,7 @@ Ginosa	GINOSA
 Gioia Del Colle	GIOIA DEL COLLE
 Gioia Tauro	GIOIA TAURO
 Gioiosa Jonica	GIOIOSA JONICA
-Giojosa Marea	GIOIA DEL COLLE
+Giojosa Marea	GIOIOSA MAREA
 Giovinazzo	GIOVINAZZO
 Giugliano Qualiano	GIUGLIANO-QUALIANO
 Giulianova	GIULIANOVA
@@ -1000,15 +1000,15 @@ Guidonia-Montecello-S.Angelo	GUIDONIA-MONTECELIO-S. ANGELO
 Hone Bard	HONE-BARD
 Igea Marina	IGEA MARINA
 Iglesias	IGLESIAS
-Il Cionfo Bin. Le Cure	IL NETO
-Il Cionfo Bin. Salviati	IL NETO
+Il Cionfo Bin. Le Cure	LE CURE
+Il Cionfo Bin. Salviati	SALVIATI
 Il Neto	IL NETO
 Imola	IMOLA
-Imperia Oneglia	IMPERIA
+Imperia Oneglia	
 Incisa	INCISA
 Incisa Scapaccino	INCISA SCAPACCINO
 Incoronata	INCORONATA
-Indicatore	LA INDIANA (APT.)
+Indicatore	
 Induno Olona	INDUNO OLONA
 Ipogeo Degli Ottavi	IPOGEO DEGLI OTTAVI
 Isernia	ISERNIA
@@ -1043,12 +1043,12 @@ Lama	LAMA
 Lama Di Reno	LAMA DI RENO
 Lambrinia	LAMBRINIA
 Lamezia Terme Centrale	LAMEZIA TERME CENTRALE
-Lamezia T. Centrale	LAMEZIA TERME AEROPORTO
-Lamezia T. C.le	LAMEZIA TERME AEROPORTO
-Lamezia Terme Nicastro	LAMEZIA TERME AEROPORTO
-Lamezia T. Nicastro	LAMEZIA TERME AEROPORTO
-Lamezia Terme Sambiase	LAMEZIA TERME AEROPORTO
-Lamezia T. Sambiase	LAMEZIA TERME AEROPORTO
+Lamezia T. Centrale	LAMEZIA TERME CENTRALE
+Lamezia T. C.le	LAMEZIA TERME CENTRALE
+Lamezia Terme Nicastro	LAMEZIA TERME-NICASTRO
+Lamezia T. Nicastro	LAMEZIA TERME-NICASTRO
+Lamezia Terme Sambiase	LAMEZIA TERME-SAMBIASE
+Lamezia T. Sambiase	LAMEZIA TERME-SAMBIASE
 Lana-Postal 	LANA-POSTAL LANA-BURGSTALL
 Lancenigo	LANCENIGO
 Lanuvio	LANUVIO
@@ -1160,7 +1160,7 @@ Mantova	MANTOVA
 Mantova Frassine	MANTOVA FRASSINE
 Manzano	MANZANO
 Manziana-Canale Monterano	MANZIANA-CANALE MONTERANO
-Marano	MARANO TICINO
+Marano	MARANO VICENTINO
 Marano Ticino	MARANO TICINO
 Maratea	MARATEA
 Marausa	MARAUSA
@@ -1172,7 +1172,7 @@ Marcianise	MARCIANISE
 Marconia	MARCONIA
 Marechiaro	MARECHIARO
 Margarita	MARGARITA
-Margherita Di Sav./Ofantino	S. MARGHERITA DI CALABRIA
+Margherita Di Sav./Ofantino	S. 
 Mariano Comense	MARIANO COMENSE
 Marianopoli	MARIANOPOLI
 Marigliano	MARIGLIANO
@@ -1180,7 +1180,7 @@ Marina Di Cerveteri	MARINA DI CERVETERI
 Marina Di Maratea	MARINA DI MARATEA
 Marina Di San Lorenzo	MARINA DI S. LORENZO
 Marinella	MARINELLA
-Marino	MARINO DEL TRONTO-FOLIGNANO
+Marino	MARINO LAZIALE
 Marino Del Tronto Folignano	MARINO DEL TRONTO-FOLIGNANO
 Marlengo	MARLENGO MARLING
 Marmore	MARMORE
@@ -1227,30 +1227,30 @@ Metaponto	METAPONTO
 Mezzani Rondani	MEZZANI-RONDANI
 Mezzano	MEZZANO
 Mezzocorona	MEZZOCORONA
-Mi P.Gar.Sott.	MIACZYN
-Mi.P.Genova	MIACZYN
+Mi P.Gar.Sott.	MILANO PORTA GARIBALDI
+Mi.P.Genova	MILANO PORTA GENOVA
 Mignanego	MIGNANEGO
 Mignano Di Monte Lungo	MIGNANO MONTE LUNGO
-Milano Bovisa Fnm	MILANO BRUZZANO
+Milano Bovisa Fnm	MILANO NORD BOVISA
 Milano Certosa	MILANO CERTOSA
 Milano Dateo	MILANO DATEO
 Milano Greco Pirelli	MILANO GRECO PIRELLI
 Milano Lambrate	MILANO LAMBRATE
 Milano Lancetti	MILANO LANCETTI
 Milano Porta Garibaldi	MILANO PORTA GARIBALDI
-MI P.Garibaldi	MIACZYN
+MI P.Garibaldi	MILANO PORTA GARIBALDI
 Milano Porta Romana	MILANO PORTA ROMANA
-MI P. Romana	MIACZYN
+MI P. Romana	MILANO PORTA ROMANA
 Milano Porta Vittoria	MILANO PORTA VITTORIA
-MI P. Vittoria	MIACZYN
+MI P. Vittoria	MILANO PORTA VITTORIA
 Milano Rogoredo	MILANO ROGOREDO
 Milano Romolo	MILANO ROMOLO
 Milano S. Cristoforo	MILANO S. CRISTOFORO
-Milano Venezia	MILANO VILLAPIZZONE
+Milano Venezia	MILANO PORTA VENEZIA
 Milazzo	MILAZZO
 Mileto	MILETO
 Militello	MILITELLO
-Mimmole	MIMBERG
+Mimmole	
 Mineo	MINEO
 Minervino Murge	MINERVINO MURGE
 Minturno	MINTURNO-SCAURI
@@ -1265,7 +1265,7 @@ Modica	MODICA
 Modugno Citta`	MODUGNO CITTA
 Mogliano Veneto	MOGLIANO VENETO
 Moiana	MOIANA
-Mojo-Alcantara Malvagna	MOJKOVAC
+Mojo-Alcantara Malvagna	MOIO-ALCANTARA-MALVAGNA
 Mola Di Bari	MOLA DI BARI
 Molare	MOLARE
 Molfetta	MOLFETTA
@@ -1336,7 +1336,7 @@ Monteroduni	MONTERODUNI S. EUSANIO
 Monteroni D`Arbia	MONTERONI D'ARBIA
 Monterosso	MONTEROSSO
 Monterosso Marche	MONTEROSSO MARCHE
-Monterotondo	MONTEROTONDO MARITTIMO
+Monterotondo	MONTEROTONDO-MENTANA
 Montesano Buonabitacolo	MONTESANO-BUONABITACOLO
 Montesanto	MONTESANTO
 Montesilvano	MONTESILVANO
@@ -1388,7 +1388,7 @@ Musiano-Pian Di Macina	MUSIANO-PIAN DI MACINA
 Mussotto	MUSSOTTO
 Muzzana Del Turgnano	MUZZANA DEL TURGNANO
 Napoli Centrale	NAPOLI CENTRALE
-Napoli C.le	NAPOLI CAMPI FLEGREI
+Napoli C.le	NAPOLI CENTRALE
 Napoli Campi Flegrei	NAPOLI CAMPI FLEGREI
 Napoli Gianturco	NAPOLI GIANTURCO
 Napoli Mergellina	NAPOLI MERGELLINA
@@ -1440,7 +1440,7 @@ Oderzo	ODERZO
 Offida Castel Di Lama	OFFIDA-CASTEL DI LAMA
 Oggiono	OGGIONO
 Olbia	OLBIA
-Olbia Marittima Isola Bianca	OLBIA
+Olbia Marittima Isola Bianca	
 Olcenengo	OLCENENGO
 Olcio	OLCIO
 Oleggio	OLEGGIO
@@ -1492,12 +1492,12 @@ Ovada	OVADA
 Ovada Nord	OVADA NORD
 Oviglio	OVIGLIO
 Ozieri Chilivani	OZIERI-CHILIVANI
-Ozieri Fraigas	OZIERI-CHILIVANI
-Ozzano Dell'Emilia	OZZANO MONFERRATO
+Ozieri Fraigas	
+Ozzano Dell'Emilia	OZZANO
 Ozzano Monferrato	OZZANO MONFERRATO
 Ozzano Taro	OZZANO TARO
 Palermo Centrale	PALERMO CENTRALE
-Palermo C.le	PALERMO CARDILLO-ZEN
+Palermo C.le	PALERMO CENTRALE
 P.C.Canaro	CANARO
 P.M. Badesse	BADESSE
 P.M.Vat	
@@ -1595,7 +1595,7 @@ Pianoro	PIANORO
 Pianzano	PIANZANO
 Piazza Al Serchio	PIAZZA AL SERCHIO
 Piazza Amedeo	NAPOLI PIAZZA AMEDEO
-Piazza Cavour	ANCONA PIAZZA CAVOUR
+Piazza Cavour	NAPOLI PIAZZA CAVOUR
 Picerno	PICERNO
 Piedimulera	PIEDIMULERA
 Pietra Ligure	PIETRA LIGURE
@@ -1618,12 +1618,12 @@ Pineto Atri	PINETO-ATRI
 Pinzano	PINZANO
 Pioltello Limito	PIOLTELLO-LIMITO
 Piombino	PIOMBINO
-Piombino Binari Mare	PIOMBINO DESE
+Piombino Binari Mare	PIOMBINO MARITTIMA
 Piombino Dese	PIOMBINO DESE
 Piona	PIONA
 Pioppe Di Salvaro	PIOPPE DI SALVARO
 Piraineto	PIRAINETO
-Pisa Binari Aeroporto	PISA ( TUTTE LE STAZIONI )
+Pisa Binari Aeroporto	PISA FERMATA AEROPORTO
 Pisa Centrale	PISA CENTRALE
 Pisa C.le	PISA CENTRALE
 Pisa San Rossore	PISA S. ROSSORE
@@ -1639,7 +1639,7 @@ Plaus	PLAUS PLAUS
 Ploaghe	PLOAGHE
 Pocapaglia	POCAPAGLIA
 Poggibonsi	POGGIBONSI-S. GIMIGNANO
-Poggio - Careggine - Vagli	POGGIO A CAIANO
+Poggio - Careggine - Vagli	POGGIO-CAREGGINE-VAGLI
 Poggio Fidoni	POGGIO FIDONI
 Poggio Imperiale	POGGIO IMPERIALE
 Poggio Mirteto	POGGIO MIRTETO
@@ -1658,7 +1658,7 @@ Pollina	POLLINA-S. MAURO CASTELVERDE
 Pombia	POMBIA
 Pomezia - S.Palomba	POMEZIA-S. PALOMBA
 Pompei	POMPEI
-Pont	PONT A VENDIN
+Pont	PONT CANAVESE
 Pont Saint Martin	PONT SAINT MARTIN
 Pontassieve	PONTASSIEVE
 Ponte A Elsa	PONTE A ELSA
@@ -1677,8 +1677,8 @@ Ponte Ginori	PONTE GINORI
 Ponte In Valtellina	PONTE IN VALTELLINA
 Ponte Nelle Alpi-Polpet	PONTE NELLE ALPI-POLPET
 Ponte Parrano Di Nocera Umbra	PONTE PARRANO DI NOCERA UMBRA
-Ponte S.Marco - Calcinato	PONTE S. CONO
-Ponte S.Pietro	PONTE S. CONO
+Ponte S.Marco - Calcinato	PONTE S. MARCO-CALCINATO
+Ponte S.Pietro	PONTE S. PIETRO
 Pontebba	PONTEBBA
 Pontecagnano	PONTECAGNANO
 Pontecchio Marconi	PONTECCHIO MARCONI
@@ -1707,7 +1707,7 @@ Porto Di Vasto	PORTO DI VASTO
 Porto D`Ascoli	PORTO D'ASCOLI
 Porto Empedocle	PORTO EMPEDOCLE CENTRALE
 Porto Recanati	PORTO RECANATI
-Porto S. Elpidio	PORTO S. GIORGIO-FERMO
+Porto S. Elpidio	PORTO S.ELPIDIO
 Porto S. Giorgio Fermo	PORTO S. GIORGIO-FERMO
 Porto Torres	PORTO TORRES
 Porto Valtravaglia	PORTO VALTRAVAGLIA
@@ -1716,7 +1716,7 @@ Portogruaro Caorle	PORTOGRUARO-CAORLE
 Portomaggiore	PORTOMAGGIORE
 Possidente	POSSIDENTE
 Postioma	POSTIOMA
-Posto Comunicazione Dolce`	POSTOJNA
+Posto Comunicazione Dolce`	DOLCE
 Potenza Inferiore	POTENZA CENTRALE
 Potenza Picena Montelupone	POTENZA PICENA-MONTELUPONE
 Potenza Superiore	POTENZA SUPERIORE
@@ -1774,14 +1774,14 @@ Ravenna	RAVENNA
 Recale	RECALE
 Recco	RECCO
 Redipuglia	REDIPUGLIA
-Reggio Calabria Centrale	REGGIO ALL'ANGELO
-Reggio C. C.le	REGGIO ALL'ANGELO
-Reggio Calabria Lido	REGGIO ALL'ANGELO
-Reggio C. Lido	REGGIO ALL'ANGELO
+Reggio Calabria Centrale	REGGIO DI CALABRIA CENTRALE
+Reggio C. C.le	REGGIO DI CALABRIA CENTRALE
+Reggio Calabria Lido	REGGIO DI CALABRIA LIDO
+Reggio C. Lido	REGGIO DI CALABRIA LIDO
 Reggio Di Calabria Catona	REGGIO DI CALABRIA CATONA
 Reggio Di Calabria Gallico	REGGIO DI CALABRIA GALLICO
 Reggio Di Calabria Pellaro	REGGIO DI CALABRIA PELLARO
-Reggio Di Calabria S.Gregorio	REGGIO DI CALABRIA S. CATERINA
+Reggio Di Calabria S.Gregorio	REGGIO DI CALABRIA S. GREGORIO
 Reggio Emilia	REGGIO EMILIA
 Reggio Emilia Av	REGGIO EMILIA AV
 Regoledo	REGOLEDO
@@ -1853,7 +1853,7 @@ Roma Nomentana L.L.	ROMA NOMENTANA
 Roma Ostiense	ROMA OSTIENSE
 Roma Prenestina	ROMA PRENESTINA
 Roma S.Filippo Neri	ROMA S. FILIPPO NERI
-Roma S.Pietro	ROMA S. FILIPPO NERI
+Roma S.Pietro	ROMA S. PIETRO
 Roma Tiburtina	ROMA TIBURTINA
 Roma Tiburtina Piazzale Est	ROMA TIBURTINA
 Roma Trastevere	ROMA TRASTEVERE
@@ -1882,7 +1882,7 @@ Rossiglione	ROSSIGLIONE
 Rosta	ROSTA
 Rottofreno	ROTTOFRENO
 Rovasenda	ROVASENDA
-Rovasenda Alta	ROVASENDA
+Rovasenda Alta	
 Rovato	ROVATO
 Roverbella	ROVERBELLA
 Rovereto	ROVERETO
@@ -1895,7 +1895,7 @@ Russi	RUSSI
 Rutino	RUTINO
 S. Ambrogio	S. AMBROGIO
 S. Antonino Di Saluggia	S. ANTONINO DI SALUGGIA
-S. Antonino Vaie	S. ANTONINO DI SALUGGIA
+S. Antonino Vaie	S. ANTONINO-VAIE
 S. Cassiano Valchiavenna	S. CASSIANO VALCHIAVENNA
 S. Cristina E Bissone	S. CRISTINA E BISSONE
 S. Damiano D`Asti	S. DAMIANO D'ASTI
@@ -1912,7 +1912,7 @@ S. Nicola Di Melfi	S. NICOLA DI MELFI
 S. Paolo Solbrito	S. PAOLO SOLBRITO
 S. Pietro A Vico	S. PIETRO A VICO
 S. Pietro Avellana-Capracotta	S. PIETRO AVELLANA-CAPRACOTTA
-S. Pietro Berbenno	S. PIETRO A MAIDA-MAIDA
+S. Pietro Berbenno	S. PIETRO-BERBENNO
 S. Pietro Vernotico	S. PIETRO VERNOTICO
 S. Stefano Di Magra	S. STEFANO DI MAGRA
 S. Stino Di Livenza	S. STINO DI LIVENZA
@@ -1927,7 +1927,7 @@ S.Angelo Dei Lombardi	S. ANGELO DEI LOMBARDI
 S.Anna Robella	S. ANNA ROBELLA
 S.Antimo S.Arpino	S. ANTIMO-S. ARPINO
 S.Antonio Mantovano	S. ANTONIO MANTOVANO
-S.Arcangelo Di Romagna	APICE-S. ARCANGELO-BONITO
+S.Arcangelo Di Romagna	SANTARCANGELO DI ROMAGNA
 S.Benedetto Del Tronto	S. BENEDETTO DEL TRONTO
 S.Benigno Di Cuneo	S. BENIGNO DI CUNEO
 S.Biagio	S. BIAGIO
@@ -1952,7 +1952,7 @@ S.Frediano A Settimo	S. FREDIANO A SETTIMO
 S.Giacomo Di Spoleto	S. GIACOMO DI SPOLETO
 S.Giorgio Casale	S. GIORGIO CASALE
 S.Giorgio Delle Pertiche	S. GIORGIO DELLE PERTICHE
-S.Giorgio P.	S. GIORGIO
+S.Giorgio P.	S. GIORGIO DI PIANO
 S.Giovanni Al Natisone	S. GIOVANNI AL NATISONE
 S.Giovanni Di Casarsa	S. GIOVANNI DI CASARSA
 S.Giovanni D`Asso	S. GIOVANNI D'ASSO
@@ -1964,11 +1964,11 @@ S.Giuseppe Vesuviano	S. GIUSEPPE VESUVIANO
 S.Giustina Cesio	S. GIUSTINA-CESIO
 S.Ilario	S. ILARIO D'ENZA
 S.Liberato	S. LIBERATO
-S.Lorenzo Colli	S. LORENZO MAGGIORE
+S.Lorenzo Colli	PALERMO S. LORENZO
 S.Lorenzo Maggiore	S. LORENZO MAGGIORE
 S.Lucido Marina	S. LUCIDO MARINA
 S.Marcellino Frignano	S. MARCELLINO-FRIGNANO
-S.Marco Roggiano	S. MARCO
+S.Marco Roggiano	S. MARCO-ROGGIANO
 S.Maria Capua Vetere	S. MARIA CAPUA VETERE
 S.Maria La Bruna	SANTA MARIA LA BRUNA
 S.Maria La Longa	S. MARIA LA LONGA
@@ -1984,7 +1984,7 @@ S.Michele In Bosco	S. MICHELE IN BOSCO
 S.Miniato Fucecchio	S. MINIATO-FUCECCHIO
 S.Nazario	S. NAZARIO
 S.Nicola Arcella	S. NICOLA ARCELLA
-S.Nicola T.	S. NICOLA
+S.Nicola T.	S. NICOLA (TONNARA)
 S.Nicolo'	S. NICOLO'
 S.Piero A Sieve	S. PIERO A SIEVE
 S.Pietro A Maida	S. PIETRO A MAIDA-MAIDA
@@ -1993,7 +1993,7 @@ S.Pietro In Gu`	S. PIETRO IN GU
 S.Romano Montopoli S.Croce	S. ROMANO-MONTOPOLI-S. CROCE
 S.Sebastiano Po	S. SEBASTIANO PO
 S.Severino Marche	S. SEVERINO MARCHE
-S.Silvestro	SAN SIMONE (LECCE)
+S.Silvestro	
 S.Stefano Belbo	S. STEFANO BELBO
 S.Stefano Lodigiano	S. STEFANO LODIGIANO
 S.Stefano Udinese	S. STEFANO UDINESE
@@ -2001,7 +2001,7 @@ S.Tommaso Del Piano	S. TOMMASO DEL PIANO
 S.Vincenzo V.R.	S. VINCENZO VALLE ROVETO
 S.Vito Al Tagliamento	S. VITO AL TAGLIAMENTO
 S.Vito Dei Normanni	S. VITO DEI NORMANNI
-S.Vito Lanciano	S. VITO AL TAGLIAMENTO
+S.Vito Lanciano	S. VITO-LANCIANO
 S.Vittoria	S. VITTORIA
 Sacile	SACILE
 Sacile San Liberale	SACILE-S. LIBERALE
@@ -2034,9 +2034,9 @@ San Benedetto Sambro-Cast.Pepoli	SAN BENEDETTO SAMBRO-CASTIGLIONE P.
 San Bonifacio	S. BONIFACIO
 San Gavino	S. GAVINO
 San Giacomo	S. GIACOMO
-San Giorgio	SAN GIORGIO JONICO
+San Giorgio	S. GIORGIO
 San Giorgio Di Nogaro	S. GIORGIO DI NOGARO
-San Giovanni	SAN GIOVANNI ROTONDO
+San Giovanni	
 San Giovanni In Persiceto	S. GIOVANNI IN PERSICETO
 San Giuseppe Di Cairo	S. GIUSEPPE DI CAIRO
 San Leonardo Di Cutro	S. LEONARDO DI CUTRO
@@ -2044,7 +2044,7 @@ San Marco D`Alunzio T.	S. MARCO D'ALUNZIO-TORRENOVA
 San Mauro La Bruca	S. MAURO LA BRUCA
 San Momme`	S. MOMME'
 San Nicola Varco Di Eboli	S. NICOLA VARCO DI EBOLI
-San Remo	ST REMY CORREZE
+San Remo	SANREMO
 San Severo	S. SEVERO
 Sandigliano	SANDIGLIANO
 Sanfre`	SANFRE
@@ -2067,7 +2067,7 @@ Santo Stefano Di Camastra	S. STEFANO DI CAMASTRA-MISTRETTA
 Santuario	SANTUARIO
 Santuario Incoronata	SANTUARIO INCORONATA
 Sant`Anna	S. ANNA
-Sant`Orsola	SANT'ANDREA
+Sant`Orsola	
 Sanzano Occhino	SANZANO-OCCHINO
 Sapri	SAPRI
 Sarmato	SARMATO
@@ -2086,10 +2086,10 @@ Savigliano	SAVIGLIANO
 Savignano Greci	SAVIGNANO-GRECI
 Savignano Sul Rubicone	SAVIGNANO SUL RUBICONE
 Savona	SAVONA
-Savona Marittima	SAVONA
+Savona Marittima	
 Scafa S.Valentino Caramanico T	SCAFA-S. VALENTINO-CARAMANICO TERME
 Scafati	SCAFATI
-Scala Di Giocca	SCALA RUIA
+Scala Di Giocca	
 Scalea S.Domenica Talao	SCALEA-S. DOMENICA TALAO
 Scalenghe	SCALENGHE
 Scaletta Zanclea	SCALETTA ZANCLEA
@@ -2275,7 +2275,7 @@ Torchiara	TORCHIARA
 Torino Dora	TORINO DORA GTT
 Torino Lingotto	TORINO LINGOTTO
 Torino Porta Susa	TORINO PORTA SUSA
-Torino S. Paolo	TORINO STURA
+Torino S. Paolo	
 Torino Stura	TORINO STURA
 Torralba	TORRALBA
 Torrazza P.	TORRAZZA PIEMONTE
@@ -2290,7 +2290,7 @@ Torre In Pietra-Palidoro	TORRE IN PIETRA-PALIDORO
 Torre Melissa	TORRE MELISSA
 Torre Orsaia	TORRE ORSAIA
 Torre Pellice	TORRE PELLICE
-Torre S.Giorgio	TORRE S.GIOVANNI-MARINA D'UGENTO
+Torre S.Giorgio	TORRE S. GIORGIO
 Torreberetti	TORREBERETTI
 Torrenieri	TORRENIERI-MONTALCINO
 Torricella	TORRICELLA
@@ -2322,7 +2322,7 @@ Treviglio Ovest	TREVIGLIO OVEST
 Trevignano Signoressa	TREVIGNANO-SIGNORESSA
 Treviso C.	TREVISO CENTRALE
 Trezzano S.N.	TREZZANO SUL NAVIGLIO
-Trieste Aquilinia	TRIESTE AIRPORT
+Trieste Aquilinia	
 Trieste Centrale	TRIESTE CENTRALE
 Trieste C.le	TRIESTE CENTRALE
 Trinitapoli S.Ferdin. Di P.	TRINITAPOLI-S. FERDINANDO DI PUGLIA
@@ -2379,12 +2379,12 @@ Varese	VARESE
 Varignana	VARIGNANA
 Vasto S.Salvo	VASTO-S. SALVO
 Vastogirardi	VASTOGIRARDI
-Ve Asseggiano	CERMNA VE SLEZSKU
+Ve Asseggiano	VENEZIA ASSEGGIANO
 Velletri	VELLETRI
 Venafro	VENAFRO
 Venetico	VENETICO
 Venezia Carpenedo	VENEZIA CARPENEDO
-Venezia Marittima	VENEZIA MESTRE
+Venezia Marittima	VENEZIA S. LUCIA
 Venezia Mestre	VENEZIA MESTRE
 Venezia Porto Marghera	VENEZIA PORTO MARGHERA
 Venosa - Maschito	VENOSA-MASCHITO
@@ -2403,7 +2403,7 @@ Vernazza	VERNAZZA
 Vernio Montepiano Cantagallo	VERNIO-MONTEPIANO-CANTAGALLO
 Verolanuova	VEROLANUOVA
 Verolengo	VEROLENGO
-Verona Ca` Di David	VERONA PORTA NUOVA
+Verona Ca` Di David	
 Verona Porta Vescovo	VERONA PORTA VESCOVO
 Verres	VERRES
 Verzuolo	VERZUOLO
@@ -2444,14 +2444,14 @@ Villa Di Tirano	VILLA DI TIRANO
 Villa Literno	VILLA LITERNO
 Villa Opicina	VILLA OPICINA
 Villa Raverio	VILLA RAVERIO
-Villa S.G.Cannitello	VILLA S. ANGELO
+Villa S.G.Cannitello	VILLA S. GIOVANNI-CANNITELLO
 Villa San Giovanni	VILLA S. GIOVANNI
 Villa San Sebastiano	VILLA S. SEBASTIANO
 Villabartolomea	VILLABARTOLOMEA
 Villabassa - Braies	VILLABASSA BRAIES/NIEDERDORF PRAGS
-Villabate	VILLABANTE (APD.)
+Villabate	
 Villadossola	VILLADOSSOLA
-Villafranca - Bagnone	VILLAFRANCA DE CORDOBA (APT.-C
+Villafranca - Bagnone	VILLAFRANCA-BAGNONE
 Villafranca C.	VILLAFRANCA-CANTARANA
 Villafranca Di Verona	VILLAFRANCA DI VERONA
 Villafranca P.	VILLAFRANCA PIEMONTE
@@ -2498,3 +2498,4 @@ Zambrone	ZAMBRONE
 Zappulla	ZAPPULLA
 Zinasco Nuovo	ZINASCO NUOVO
 Zoagli	ZOAGLI
+Albairate Vermezzo	ALBAIRATE
