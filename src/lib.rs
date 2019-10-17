@@ -213,17 +213,17 @@ impl Trenitalia {
                             let url = format!("https://eutampieri.eu/fix_localita.php?nome={}", &train.departurestation);
                             let _ = reqwest::get(url.as_str());
                             None
-                        }).expect("Inconsistency in LeFrecce station names (key not found)")).or_else(|| {
+                        }).expect(&format!("Inconsistency in LeFrecce station names (key '{}' not found)", &train.departurestation.to_uppercase()))).or_else(|| {
                             let url = format!("https://eutampieri.eu/fix_localita.php?nome={}", &train.departurestation);
                             let _ = reqwest::get(url.as_str());
                             None
                         }).expect("Inconsistency in LeFrecce->VT mapping");
                     let to = self.get_train_station(self.lefrecce_to_id.get(&train.arrivalstation.to_uppercase()).or_else(|| {
-                            let url = format!("https://eutampieri.eu/fix_localita.php?nome={}", &train.departurestation);
+                            let url = format!("https://eutampieri.eu/fix_localita.php?nome={}", &train.arrivalstation);
                             let _ = reqwest::get(url.as_str());
                             None
-                        }).expect("Inconsistency in LeFrecce station names (key not found)")).or_else(|| {
-                            let url = format!("https://eutampieri.eu/fix_localita.php?nome={}", &train.departurestation);
+                        }).expect(&format!("Inconsistency in LeFrecce station names (key '{}' not found)", &train.arrivalstation.to_uppercase()))).or_else(|| {
+                            let url = format!("https://eutampieri.eu/fix_localita.php?nome={}", &train.arrivalstation);
                             let _ = reqwest::get(url.as_str());
                             None
                         }).expect("Inconsistency in LeFrecce->VT mapping");
@@ -560,6 +560,7 @@ mod tests {
                 if from.id == to.id {
                     continue;
                 }
+                println!("Trip from {} to {}", from.name, to.name);
                 let res = t.find_trips(from, to, &chrono::Local::now());
                 drop(res);
             }
