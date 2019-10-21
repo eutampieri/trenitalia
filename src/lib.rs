@@ -1,5 +1,4 @@
 use chrono::prelude::*;
-use drs_primitives::*;
 
 mod mapping;
 
@@ -88,7 +87,7 @@ impl TrainTrip{
 pub struct TrainStation {
     pub id: String,
     pub region_id: u8,
-    pub position: Coord,
+    pub position: (f64, f64),
     pub aliases: Vec<String>,
     pub vt_id: Option<String>,
     pub lefrecce_name: Option<String>,
@@ -160,10 +159,10 @@ impl Trenitalia {
                 a.append(&mut v);TrainStation{
                 id: String::from(x[1]),
                 aliases: a,
-                position: Coord{
-                    lat: x[3].parse::<f64>().unwrap(),
-                    lon: x[4].parse::<f64>().unwrap()
-                },
+                position: (
+                    x[3].parse::<f64>().unwrap(),
+                    x[4].parse::<f64>().unwrap()
+                ),
                 region_id: x[2].parse::<u8>().unwrap(),
                 lefrecce_name: id_to_lf.get(x[1]).map(|x| String::from(x)),
                 vt_id: id_to_vt.get(x[1]).map(|x| String::from(x)),
@@ -514,11 +513,11 @@ impl Trenitalia {
     pub fn nearest_station(&self, point: (f64,f64)) -> &TrainStation {
         let mut min_dist = std::f64::MAX;
         let mut sta = &self.stations[0];
-        let coord = Coord{lat: point.0, lon: point.1};
         for station in &self.stations {
-            if station.position.distance(&coord) < min_dist {
+            let dist_sq = (station.position.0 - point.0).powf(2.0) + (station.position.1 - point.1).powf(2.0);
+            if dist_sq < min_dist {
                 sta = station;
-                min_dist = station.position.distance(&coord);
+                min_dist = dist_sq;
             }
         }
         sta
@@ -528,12 +527,6 @@ impl Trenitalia {
 #[cfg(test)]
 mod tests {
     use super::*;
-    #[test]
-    fn distance_test() {
-        let a = Coord{lat: 1.0, lon: 1.0};
-        let b = Coord{lat: 2.0, lon: 2.0};
-        assert_eq!(a.distance(&b), 157.22543203805722);
-    }
 
     #[test]
     fn lookup_test() {
