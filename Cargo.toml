@@ -3,6 +3,8 @@ name = "trenitalia"
 version = "0.1.0"
 authors = ["Eugenio Tampieri <eugenio.tampieri@icloud.com>"]
 edition = "2018"
+description = "A crate to get information about Trenitalia trains and stations"
+license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
