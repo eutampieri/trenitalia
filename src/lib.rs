@@ -1,5 +1,4 @@
 use chrono::prelude::*;
-use std::io::*;
 use drs_primitives::*;
 
 mod mapping;
@@ -79,65 +78,101 @@ impl TrainTrip{
         TrainTrip{
             train_number: String::from(reference.train_number.as_str()),
             train_type: reference.train_type,
-            arrival: (TrainStation{
-                name: String::from(reference.arrival.0.name.as_str()),
-                id: String::from(reference.arrival.0.id.as_str()),
-                region_id: reference.arrival.0.region_id,
-                position: reference.arrival.0.position,
-                }, reference.arrival.1),
-            departure: (TrainStation{
-                name: String::from(reference.departure.0.name.as_str()),
-                id: String::from(reference.departure.0.id.as_str()),
-                region_id: reference.departure.0.region_id,
-                position: reference.departure.0.position,
-                }, reference.departure.1),
+            arrival: (TrainStation::from(&reference.arrival.0), reference.arrival.1),
+            departure: (TrainStation::from(&reference.departure.0), reference.departure.1),
         }
     }
 }
 
 #[derive(Debug, Clone)]
 pub struct TrainStation {
-    pub name: String,
     pub id: String,
     pub region_id: u8,
-    pub position: Coord
+    pub position: Coord,
+    pub aliases: Vec<String>,
+    pub vt_id: Option<String>,
+    pub lefrecce_name: Option<String>,
 }
 
 impl TrainStation {
-    fn short_id(&self) -> String {
-        str::replace(&self.id, "S", "").parse::<u16>().unwrap().to_string()
+    pub fn from(reference: &Self) -> Self {
+        let lf_n = match &reference.lefrecce_name {
+            Some(x) => Some(String::from(x)),
+            None => None
+        };
+        let vt_id = match &reference.vt_id {
+            Some(x) => Some(String::from(x)),
+            None => None
+        };
+        TrainStation{
+            aliases: reference.aliases.iter().map(|x| String::from(x)).collect(),
+            id: String::from(reference.id.as_str()),
+            lefrecce_name: lf_n,
+            vt_id: vt_id,
+            region_id: reference.region_id,
+            position: reference.position,
+        }
+    }
+    fn short_id(&self) -> Option<String> {
+        match &self.vt_id {
+            None => None,
+            Some(x) => Some(str::replace(x, "S", "").parse::<u16>().unwrap().to_string())
+        }
+    }
+    pub fn get_name(&self) -> &str {
+        &self.aliases[0]
     }
 }
 
 pub struct Trenitalia {
     stations: Vec<TrainStation>,
     lefrecce_to_id: std::collections::HashMap<String, String>,
-    viaggiatreno_to_lefrecce: std::collections::HashMap<String, String>,
 }
 
 impl Trenitalia {
     /// Creates a new Trenitalia instance
     pub fn new() -> Trenitalia {
-        let station_list_tsv = include_str!("../stazioni_coord.tsv");
-        let mut station_list = station_list_tsv.split("\n").collect::<Vec<&str>>();
-        station_list.remove(0);
-        station_list.remove(&station_list.len()-1);
+        let id_to_lf_tsv = include_str!("../id_lf_map.tsv");
+        let id_to_lf: std::collections::HashMap<String, String> = std::collections::HashMap::from(id_to_lf_tsv.split("\n").collect::<Vec<&str>>()
+            .iter().map(|&x| x.split("\t").collect::<Vec<&str>>()).collect::<Vec<Vec<&str>>>()
+            .iter().map(|x| (String::from(*&x[0]), String::from(*&x[1]))).collect::<Vec<(String, String)>>().into_iter().collect());
+        let lf_to_id: std::collections::HashMap<String, String> = std::collections::HashMap::from(id_to_lf_tsv.split("\n").collect::<Vec<&str>>()
+            .iter().map(|&x| x.split("\t").collect::<Vec<&str>>()).collect::<Vec<Vec<&str>>>()
+            .iter().map(|x| (String::from(*&x[1]), String::from(*&x[0]))).collect::<Vec<(String, String)>>().into_iter().collect());
+        let id_to_vt_tsv = include_str!("../id_vt.tsv");
+        let id_to_vt: std::collections::HashMap<String, String> = std::collections::HashMap::from(id_to_vt_tsv.split("\n").collect::<Vec<&str>>()
+            .iter().map(|&x| x.split("\t").collect::<Vec<&str>>()).collect::<Vec<Vec<&str>>>()
+            .iter().map(|x| (String::from(*&x[0]), String::from(*&x[1]))).collect::<Vec<(String, String)>>().into_iter().collect());
+
+        let aliases_tsv = include_str!("../aliases.tsv");
+        let aliases: Vec<Vec<&str>> = aliases_tsv.split("\n").collect::<Vec<&str>>()
+            .iter().map(|&x| x.split("\t").collect::<Vec<&str>>()).collect::<Vec<Vec<&str>>>();
+
+        let station_list_tsv = include_str!("../stations.tsv");
+        let station_list = station_list_tsv.split("\n").collect::<Vec<&str>>();
         let mapped_stations: Vec<TrainStation> = station_list.iter()
             .map(|&x| x.split("\t").collect::<Vec<&str>>())
             .collect::<Vec<Vec<&str>>>().iter()
-            .map(|x|  TrainStation{id: String::from(x[1]), name: String::from(x[0]), position: Coord{
-                lat: x[3].parse::<f64>().unwrap(),
-                lon: x[4].parse::<f64>().unwrap()
-            }, region_id: x[2].parse::<u8>().unwrap()}).collect();
-        let vt_to_lf_tsv = include_str!("../vt_lf_map.tsv");
-        let vt_to_lf: std::collections::HashMap<String, String> = std::collections::HashMap::from(vt_to_lf_tsv.split("\n").collect::<Vec<&str>>()
-            .iter().map(|&x| x.split("\t").collect::<Vec<&str>>()).collect::<Vec<Vec<&str>>>()
-            .iter().map(|x| (String::from(*&x[0]), String::from(*&x[1]))).collect::<Vec<(String, String)>>().into_iter().collect());
-        let lf_to_id_tsv = include_str!("../lf_vt_map.tsv");
-        let lf_to_id: std::collections::HashMap<String, String> = std::collections::HashMap::from(lf_to_id_tsv.split("\n").collect::<Vec<&str>>()
-            .iter().map(|&x| x.split("\t").collect::<Vec<&str>>()).collect::<Vec<Vec<&str>>>()
-            .iter().map(|x| (String::from(*&x[0]), String::from(*&x[1]))).collect::<Vec<(String, String)>>().into_iter().collect());
-        Trenitalia{stations: mapped_stations, viaggiatreno_to_lefrecce: vt_to_lf, lefrecce_to_id: lf_to_id}
+            .map(|x|  {let mut a = vec![String::from(x[0])];
+                let mut v: Vec<String> = Vec::new();
+                for alias in &aliases {
+                    if &alias[1] == &x[1] {
+                        v.push(String::from(alias[0]))
+                    }
+                }
+                a.append(&mut v);TrainStation{
+                id: String::from(x[1]),
+                aliases: a,
+                position: Coord{
+                    lat: x[3].parse::<f64>().unwrap(),
+                    lon: x[4].parse::<f64>().unwrap()
+                },
+                region_id: x[2].parse::<u8>().unwrap(),
+                lefrecce_name: id_to_lf.get(x[1]).map(|x| String::from(x)),
+                vt_id: id_to_vt.get(x[1]).map(|x| String::from(x)),
+            }}).collect();
+        
+        Trenitalia{stations: mapped_stations, lefrecce_to_id: lf_to_id}
     }
     fn match_train_type(&self, description: &str) -> TrainType{
         let train_type = match description {
@@ -169,29 +204,17 @@ impl Trenitalia {
         train_type
     }
     fn find_trips_lefrecce(&self, from: &TrainStation, to: &TrainStation, when: &chrono::DateTime<chrono::Local>) -> Vec<Vec<TrainTrip>>{
-        if from.id == to.id {
+        if from.id == to.id || from.lefrecce_name.is_none() || from.lefrecce_name.is_none(){
             return vec![];
         }
-        let updated_from = TrainStation{
-            id: String::from(&from.id),
-            name: String::from(self.viaggiatreno_to_lefrecce.get(from.name.as_str()).unwrap()),
-            position: from.position,
-            region_id: from.region_id,
-        };
-        let updated_to = TrainStation{
-            id: String::from(&to.id),
-            name: String::from(self.viaggiatreno_to_lefrecce.get(to.name.as_str()).unwrap()),
-            position: to.position,
-            region_id: to.region_id,
-        };
         let mut result: Vec<Vec<TrainTrip>> = Vec::new();
         let client = reqwest::Client::builder()
             .cookie_store(true)
             .build()
             .unwrap();
         let url = format!("https://www.lefrecce.it/msite/api/solutions?origin={}&destination={}&arflag=A&adate={}&atime={}&adultno=1&childno=0&direction=A&frecce=false&onlyRegional=false",
-            updated_from.name.replace(" ", "%20"),
-            updated_to.name.replace(" ", "%20"),
+            from.lefrecce_name.clone().unwrap().replace(" ", "%20"),
+            to.lefrecce_name.clone().unwrap().replace(" ", "%20"),
             when.format("%d/%m/%Y"),
             when.format("%H")
         );
@@ -233,20 +256,10 @@ impl Trenitalia {
                             None
                         }).expect("Inconsistency in LeFrecce->VT mapping");
                     train_trips.push(TrainTrip{
-                        departure: (TrainStation{
-                                id: String::from(&from.id),
-                                name: String::from(&from.name),
-                                position: from.position,
-                                region_id: from.region_id
-                            },
+                        departure: (TrainStation::from(from),
                             chrono::Local.datetime_from_str(train.departuretime.as_str(), "%+").expect("Data non valida"),
                         ),
-                        arrival: (TrainStation{
-                                id: String::from(&to.id),
-                                name: String::from(&to.name),
-                                position: to.position,
-                                region_id: to.region_id
-                            },
+                        arrival: (TrainStation::from(to),
                             chrono::Local.datetime_from_str(train.arrivaltime.as_str(), "%+").expect("Data non valida"),
                         ),
                         train_number: String::from(train_number),
@@ -264,8 +277,8 @@ impl Trenitalia {
     pub fn find_trips(&self, from: &TrainStation, to: &TrainStation, when: &chrono::DateTime<chrono::Local>) -> Vec<Vec<TrainTrip>>{
         let mut result: Vec<Vec<TrainTrip>> = Vec::new();
         let url = format!("http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/soluzioniViaggioNew/{}/{}/{}",
-            from.short_id(),
-            to.short_id(),
+            from.short_id().unwrap(),
+            to.short_id().unwrap(),
             when.format("%FT%T")
         );
         if cfg!(debug_assertions) {
@@ -279,16 +292,16 @@ impl Trenitalia {
             let mut train_trips: Vec<TrainTrip> = Vec::new();
             if cfg!(debug_assertions) {
                 println!("expected: {}, found: {}, delta: {}",
-                &from.name,
+                &from.get_name(),
                 &soluzione.vehicles[0].origine.as_ref().unwrap_or(&String::from("")),
                 utils::match_strings(
                 &soluzione.vehicles[0].origine.as_ref().unwrap_or(&String::from("")).to_lowercase(),
-                &from.name
+                &from.get_name()
             ));
             }
             if utils::match_strings(
                 &soluzione.vehicles[0].origine.as_ref().unwrap_or(&String::from("")),
-                &from.name
+                &from.get_name()
             ) < WORDS_EQUALITY_THRESHOLD {
                 let filling_to = self.find_train_station_offline(soluzione.vehicles[0].origine.as_ref().unwrap_or(&String::from("")))
                     .unwrap_or_else(|| self.find_train_station(soluzione.vehicles[0].origine.as_ref().unwrap_or(&String::from("")))
@@ -311,12 +324,7 @@ impl Trenitalia {
                 }
             }
             let mut old_to: Option<&str> = None;
-            let mut old_to_stn = TrainStation{
-                            id: String::from(&to.id),
-                            name: String::from(&to.name),
-                            position: to.position,
-                            region_id: to.region_id
-            };
+            let mut old_to_stn = TrainStation::from(to);
             let mut old_ts = chrono::Local.timestamp(when.timestamp(), 0);
             for train_trip in soluzione.vehicles.iter() {
                 let from = self.find_train_station_offline(train_trip.origine.as_ref().unwrap_or(&String::from("")))
@@ -333,7 +341,7 @@ impl Trenitalia {
                         let _ = reqwest::get(url.as_str());
                         None
                     }).expect("Inconsistency in Trenitalia"));
-                if old_to.is_some() && old_to!=Some(&from.name){
+                if old_to.is_some() && old_to!=Some(&from.get_name()){
                     let filling_solutions = self.find_trips_lefrecce(&old_to_stn, from, &old_ts);
                     for filling_solution in filling_solutions.iter() {
                         if filling_solution[0].departure.1 >= old_ts && filling_solution[&filling_solution.len()-1].arrival.1 <= chrono::Local.datetime_from_str(train_trip.orarioPartenza.as_str(), "%FT%T").expect("Data non valida") {
@@ -344,29 +352,14 @@ impl Trenitalia {
                         }
                     }
                 }
-                old_to = Some(&to.name);
-                old_to_stn = TrainStation{
-                            id: String::from(&to.id),
-                            name: String::from(&to.name),
-                            position: to.position,
-                            region_id: to.region_id
-                };
+                old_to = Some(&to.get_name());
+                old_to_stn = TrainStation::from(to);
                 old_ts = chrono::Local.datetime_from_str(train_trip.orarioArrivo.as_str(), "%FT%T").expect("Data non valida");
                 train_trips.push(TrainTrip{
-                    departure: (TrainStation{
-                            id: String::from(&from.id),
-                            name: String::from(&from.name),
-                            position: from.position,
-                            region_id: from.region_id
-                        },
+                    departure: (TrainStation::from(from),
                         chrono::Local.datetime_from_str(train_trip.orarioPartenza.as_str(), "%FT%T").expect("Data non valida"),
                     ),
-                    arrival: (TrainStation{
-                            id: String::from(&to.id),
-                            name: String::from(&to.name),
-                            position: to.position,
-                            region_id: to.region_id
-                        },
+                    arrival: (TrainStation::from(to),
                         chrono::Local.datetime_from_str(train_trip.orarioArrivo.as_str(), "%FT%T").expect("Data non valida"),
                     ),
                     train_number: String::from(train_trip.numeroTreno.as_str()),
@@ -375,16 +368,16 @@ impl Trenitalia {
             }
             if cfg!(debug_assertions) {
                 println!("expected: {}, found: {}, delta: {}",
-                &to.name,
+                &to.get_name(),
                 &soluzione.vehicles[&soluzione.vehicles.len()-1].destinazione.as_ref().unwrap_or(&String::from("")),
                 utils::match_strings(
                 &soluzione.vehicles[&soluzione.vehicles.len()-1].destinazione.as_ref().unwrap_or(&String::from("")),
-                &to.name,
+                &to.get_name(),
             ));
             }
             if utils::match_strings(
                 &soluzione.vehicles[&soluzione.vehicles.len()-1].destinazione.as_ref().unwrap_or(&String::from("")),
-                &to.name
+                &to.get_name()
             ) < WORDS_EQUALITY_THRESHOLD {
                 let filling_from = self.find_train_station_offline(soluzione.vehicles[&soluzione.vehicles.len()-1].destinazione.as_ref().unwrap_or(&String::from("")))
                     .unwrap_or_else(|| self.find_train_station(soluzione.vehicles[&soluzione.vehicles.len()-1].destinazione.as_ref().unwrap_or(&String::from("")))
@@ -428,7 +421,14 @@ impl Trenitalia {
             None
         } else {
             for station in &self.stations {
-                if station.id == body[0][1] {
+                let vt_id = match &station.vt_id {
+                    Some(x) => Some(String::from(x)),
+                    None => None
+                };
+
+                if station.vt_id.is_none(){
+                    continue
+                } else if vt_id.unwrap() == body[0][1] {
                     return Some(station);
                 }
             }
@@ -453,7 +453,7 @@ impl Trenitalia {
         let mut found_station = &self.stations[0];
 
         for station in &self.stations {
-            let diff = utils::match_strings(&station.name, &name);
+            let diff = utils::match_strings(&station.get_name(), &name);
             if cfg!(debug_assertions) {
                 //println!("Difference between {} and {} = {}", &station.name, &name, diff);
             }
@@ -532,13 +532,13 @@ mod tests {
     #[test]
     fn test(){
         let t = Trenitalia::new();
-        let calalzo = t.nearest_station((46.45, 12.383333));
+        let _calalzo = t.nearest_station((46.45, 12.383333));
         let _carnia = t.nearest_station((46.374318, 13.134141));
         let imola = t.nearest_station((44.3533, 11.7141));
-        let cesena = t.nearest_station((44.133333, 12.233333));
-        let bologna = t.find_train_station("vipiteno").unwrap();
+        let _cesena = t.nearest_station((44.133333, 12.233333));
         //println!("{:?}, {:?}", imola, calalzo);
-        println!("{:?}", t.find_train_station_offline("immola"));
+        println!("{:?}", t.find_train_station_offline("bologna centrale"));
+        let bologna = t.find_train_station("vipiteno").unwrap();
         println!("{:?}", t.find_trips(imola, bologna, &chrono::Local::now()));/*
             .iter()
             .map(|x| TrainTrips(x.to_vec()).get_duration())
@@ -546,18 +546,16 @@ mod tests {
         );*/
     }
 
-    #[test]
+    /*#[test]
     fn test_bastardissimo(){
         let class = std::env::var("CLASS_BASTARDA").unwrap().parse::<usize>().unwrap();
         let t = Trenitalia::new();
         let station_list_tsv = include_str!("../stazioni_coord.tsv");
-        let mut station_list = station_list_tsv.split("\n").collect::<Vec<&str>>();
-        station_list.remove(0);
-        station_list.remove(&station_list.len()-1);
+        let station_list = station_list_tsv.split("\n").collect::<Vec<&str>>();
         let mapped_stations: Vec<super::TrainStation> = station_list.iter()
             .map(|&x| x.split("\t").collect::<Vec<&str>>())
             .collect::<Vec<Vec<&str>>>().iter()
-            .map(|x|  super::TrainStation{id: String::from(x[1]), name: String::from(x[0]), position: Coord{
+            .map(|x|  super::TrainStation{id: String::from(x[1]), aliases: vec![String::from(x[0])], position: Coord{
                 lat: x[3].parse::<f64>().unwrap(),
                 lon: x[4].parse::<f64>().unwrap()
             }, region_id: x[2].parse::<u8>().unwrap()}).collect();
@@ -569,10 +567,10 @@ mod tests {
                 if from.id == to.id {
                     continue;
                 }
-                println!("Trip from {} to {}", from.name, to.name);
+                println!("Trip from {} to {}", from.get_name(), to.get_name());
                 let res = t.find_trips(from, to, &chrono::Local::now());
                 drop(res);
             }
         }
-    }
+    }*/
 }
