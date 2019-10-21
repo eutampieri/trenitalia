@@ -126,7 +126,7 @@ impl TrainStation {
 
 pub struct Trenitalia {
     stations: Vec<TrainStation>,
-    lefrecce_to_id: std::collections::HashMap<String, String>,
+    fast_station_lookup: std::collections::HashMap<String, usize>
 }
 
 impl Trenitalia {
@@ -136,9 +136,6 @@ impl Trenitalia {
         let id_to_lf: std::collections::HashMap<String, String> = std::collections::HashMap::from(id_to_lf_tsv.split("\n").collect::<Vec<&str>>()
             .iter().map(|&x| x.split("\t").collect::<Vec<&str>>()).collect::<Vec<Vec<&str>>>()
             .iter().map(|x| (String::from(*&x[0]), String::from(*&x[1]))).collect::<Vec<(String, String)>>().into_iter().collect());
-        let lf_to_id: std::collections::HashMap<String, String> = std::collections::HashMap::from(id_to_lf_tsv.split("\n").collect::<Vec<&str>>()
-            .iter().map(|&x| x.split("\t").collect::<Vec<&str>>()).collect::<Vec<Vec<&str>>>()
-            .iter().map(|x| (String::from(*&x[1]), String::from(*&x[0]))).collect::<Vec<(String, String)>>().into_iter().collect());
         let id_to_vt_tsv = include_str!("../id_vt.tsv");
         let id_to_vt: std::collections::HashMap<String, String> = std::collections::HashMap::from(id_to_vt_tsv.split("\n").collect::<Vec<&str>>()
             .iter().map(|&x| x.split("\t").collect::<Vec<&str>>()).collect::<Vec<Vec<&str>>>()
@@ -171,8 +168,16 @@ impl Trenitalia {
                 lefrecce_name: id_to_lf.get(x[1]).map(|x| String::from(x)),
                 vt_id: id_to_vt.get(x[1]).map(|x| String::from(x)),
             }}).collect();
-        
-        Trenitalia{stations: mapped_stations, lefrecce_to_id: lf_to_id}
+        let mut lookup: std::collections::HashMap<String, usize> = std::collections::HashMap::new();
+        for i in 0..mapped_stations.len() {
+            for alias in &mapped_stations[i].aliases{
+                lookup.insert(String::from(alias), i);
+            }
+            if mapped_stations[i].lefrecce_name.is_some() {
+                lookup.insert(String::from(mapped_stations[i].lefrecce_name.as_ref().unwrap_or(&"".to_string())).to_uppercase(), i);
+            }
+        }
+        Trenitalia{stations: mapped_stations, fast_station_lookup: lookup}
     }
     fn match_train_type(&self, description: &str) -> TrainType{
         let train_type = match description {
@@ -237,24 +242,20 @@ impl Trenitalia {
                     let acronym = train.trainacronym.as_ref().map_or(String::from(""), |x| String::from(x.as_str()));
                     let train_name_exploded: Vec<&str> = train.trainidentifier.split(' ').collect();
                     let train_number = train_name_exploded[&train_name_exploded.len()-1];
-                    let from = self.get_train_station(self.lefrecce_to_id.get(&train.departurestation.to_uppercase()).or_else(|| {
-                            let url = format!("https://eutampieri.eu/fix_localita.php?nome={}", &train.departurestation);
-                            let _ = reqwest::get(url.as_str());
-                            None
-                        }).expect(&format!("Inconsistency in LeFrecce station names (key '{}' not found)", &train.departurestation.to_uppercase()))).or_else(|| {
-                            let url = format!("https://eutampieri.eu/fix_localita.php?nome={}", &train.departurestation);
-                            let _ = reqwest::get(url.as_str());
-                            None
-                        }).expect("Inconsistency in LeFrecce->VT mapping");
-                    let to = self.get_train_station(self.lefrecce_to_id.get(&train.arrivalstation.to_uppercase()).or_else(|| {
-                            let url = format!("https://eutampieri.eu/fix_localita.php?nome={}", &train.arrivalstation);
-                            let _ = reqwest::get(url.as_str());
-                            None
-                        }).expect(&format!("Inconsistency in LeFrecce station names (key '{}' not found)", &train.arrivalstation.to_uppercase()))).or_else(|| {
-                            let url = format!("https://eutampieri.eu/fix_localita.php?nome={}", &train.arrivalstation);
-                            let _ = reqwest::get(url.as_str());
-                            None
-                        }).expect("Inconsistency in LeFrecce->VT mapping");
+                    let from = &self.stations[
+                    *self.fast_station_lookup.get(&train.departurestation.to_uppercase())
+                    .or_else(|| {
+                        let url = format!("https://eutampieri.eu/fix_localita.php?nome={}", &train.departurestation);
+                        let _ = reqwest::get(url.as_str());
+                        None
+                    }).expect("Inconsistency in Trenitalia")];
+                    let to = &self.stations[
+                    *self.fast_station_lookup.get(&train.arrivalstation.to_uppercase())
+                    .or_else(|| {
+                        let url = format!("https://eutampieri.eu/fix_localita.php?nome={}", &train.arrivalstation);
+                        let _ = reqwest::get(url.as_str());
+                        None
+                    }).expect("Inconsistency in Trenitalia")];
                     train_trips.push(TrainTrip{
                         departure: (TrainStation::from(from),
                             chrono::Local.datetime_from_str(train.departuretime.as_str(), "%+").expect("Data non valida"),
@@ -303,13 +304,14 @@ impl Trenitalia {
                 &soluzione.vehicles[0].origine.as_ref().unwrap_or(&String::from("")),
                 &from.get_name()
             ) < WORDS_EQUALITY_THRESHOLD {
-                let filling_to = self.find_train_station_offline(soluzione.vehicles[0].origine.as_ref().unwrap_or(&String::from("")))
-                    .unwrap_or_else(|| self.find_train_station(soluzione.vehicles[0].origine.as_ref().unwrap_or(&String::from("")))
+                let filling_to = &self.stations[
+                    *self.fast_station_lookup.get(
+                        soluzione.vehicles[0].origine.as_ref().unwrap_or(&String::from("")))
                     .or_else(|| {
                         let url = format!("https://eutampieri.eu/fix_localita.php?nome={}", soluzione.vehicles[0].origine.as_ref().unwrap_or(&String::from("")));
                         let _ = reqwest::get(url.as_str());
                         None
-                    }).expect("Inconsistency in Trenitalia"));
+                    }).expect("Inconsistency in Trenitalia")];
                 if cfg!(debug_assertions) {
                     println!("filling_to = {:?}", filling_to);
                 }
@@ -327,20 +329,22 @@ impl Trenitalia {
             let mut old_to_stn = TrainStation::from(to);
             let mut old_ts = chrono::Local.timestamp(when.timestamp(), 0);
             for train_trip in soluzione.vehicles.iter() {
-                let from = self.find_train_station_offline(train_trip.origine.as_ref().unwrap_or(&String::from("")))
-                    .unwrap_or_else(|| self.find_train_station(train_trip.origine.as_ref().unwrap_or(&String::from("")))
+                let from = &self.stations[
+                    *self.fast_station_lookup.get(
+                        train_trip.origine.as_ref().unwrap_or(&String::from("")))
                     .or_else(|| {
                         let url = format!("https://eutampieri.eu/fix_localita.php?nome={}", train_trip.origine.as_ref().unwrap_or(&String::from("")));
                         let _ = reqwest::get(url.as_str());
                         None
-                    }).expect("Inconsistency in Trenitalia"));
-                let to = self.find_train_station_offline(train_trip.destinazione.as_ref().unwrap_or(&String::from("")))
-                    .unwrap_or_else(|| self.find_train_station(train_trip.destinazione.as_ref().unwrap_or(&String::from("")))
+                    }).expect("Inconsistency in Trenitalia")];
+                let to = &self.stations[
+                    *self.fast_station_lookup.get(
+                        train_trip.destinazione.as_ref().unwrap_or(&String::from("")))
                     .or_else(|| {
                         let url = format!("https://eutampieri.eu/fix_localita.php?nome={}", train_trip.destinazione.as_ref().unwrap_or(&String::from("")));
                         let _ = reqwest::get(url.as_str());
                         None
-                    }).expect("Inconsistency in Trenitalia"));
+                    }).expect("Inconsistency in Trenitalia")];
                 if old_to.is_some() && old_to!=Some(&from.get_name()){
                     let filling_solutions = self.find_trips_lefrecce(&old_to_stn, from, &old_ts);
                     for filling_solution in filling_solutions.iter() {
@@ -379,13 +383,14 @@ impl Trenitalia {
                 &soluzione.vehicles[&soluzione.vehicles.len()-1].destinazione.as_ref().unwrap_or(&String::from("")),
                 &to.get_name()
             ) < WORDS_EQUALITY_THRESHOLD {
-                let filling_from = self.find_train_station_offline(soluzione.vehicles[&soluzione.vehicles.len()-1].destinazione.as_ref().unwrap_or(&String::from("")))
-                    .unwrap_or_else(|| self.find_train_station(soluzione.vehicles[&soluzione.vehicles.len()-1].destinazione.as_ref().unwrap_or(&String::from("")))
+                let filling_from = &self.stations[
+                    *self.fast_station_lookup.get(
+                        soluzione.vehicles[&soluzione.vehicles.len()-1].destinazione.as_ref().unwrap_or(&String::from("")))
                     .or_else(|| {
                         let url = format!("https://eutampieri.eu/fix_localita.php?nome={}", soluzione.vehicles[&soluzione.vehicles.len()-1].destinazione.as_ref().unwrap_or(&String::from("")));
                         let _ = reqwest::get(url.as_str());
                         None
-                    }).expect("Inconsistency in Trenitalia"));
+                    }).expect("Inconsistency in Trenitalia")];
                 if cfg!(debug_assertions) {
                     println!("filling_from = {:?}", filling_from);
                 }
@@ -529,6 +534,14 @@ mod tests {
         let b = Coord{lat: 2.0, lon: 2.0};
         assert_eq!(a.distance(&b), 157.22543203805722);
     }
+
+    #[test]
+    fn lookup_test() {
+        let t = Trenitalia::new();
+        println!("{:?}", t.find_train_station_offline("bolzano"));
+        assert!(t.fast_station_lookup.get("Bolzano").is_some());
+    }
+
     #[test]
     fn test(){
         let t = Trenitalia::new();
