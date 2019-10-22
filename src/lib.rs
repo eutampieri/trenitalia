@@ -408,7 +408,7 @@ impl Trenitalia {
         result
     }
 
-    pub fn find_train_station(&self, name: &str) -> Option<&TrainStation> {
+    pub fn find_train_station_online(&self, name: &str) -> Option<&TrainStation> {
         //return Some(&self.stations[0]);
         let url = format!("http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/autocompletaStazione/{}", name);
         if cfg!(debug_assertions) {
@@ -452,24 +452,28 @@ impl Trenitalia {
         None
     }
 
-    pub fn find_train_station_offline(&self, name: &str) -> Option<&TrainStation> {
+    pub fn find_train_station(&self, name: &str) -> Option<&TrainStation> {
         let mut min_diff = 0.0;
         let mut found_station = &self.stations[0];
-
-        for station in &self.stations {
-            let diff = utils::match_strings(&station.get_name(), &name);
-            if cfg!(debug_assertions) {
-                //println!("Difference between {} and {} = {}", &station.name, &name, diff);
+        match self.fast_station_lookup.get(&name.to_uppercase()) {
+            Some(x) => return Some(&self.stations[*x]),
+            None => {
+                for station in &self.stations {
+                    let diff = utils::match_strings(&station.get_name(), &name);
+                    if cfg!(debug_assertions) {
+                        //println!("Difference between {} and {} = {}", &station.name, &name, diff);
+                    }
+                    if diff == 1.0 {
+                        return Some(station);
+                    }
+                    if diff > min_diff {
+                        min_diff = diff;
+                        found_station = station;
+                    }
+                }
+                return if min_diff >= WORDS_EQUALITY_THRESHOLD {Some(found_station)} else {None}
             }
-            if diff == 1.0 {
-                return Some(station);
-            }
-            if diff > min_diff {
-                min_diff = diff;
-                found_station = station;
-            }
-        }
-        if min_diff >= WORDS_EQUALITY_THRESHOLD {Some(found_station)} else {None}
+        };
     }
 
     fn train_info_raw(&self, number: &str, from: &str){}
@@ -531,7 +535,7 @@ mod tests {
     #[test]
     fn lookup_test() {
         let t = Trenitalia::new();
-        println!("{:?}", t.find_train_station_offline("bolzano"));
+        println!("{:?}", t.find_train_station("bolzano"));
         assert!(t.fast_station_lookup.get("Bolzano").is_some());
     }
 
@@ -543,7 +547,7 @@ mod tests {
         let imola = t.nearest_station((44.3533, 11.7141));
         let _cesena = t.nearest_station((44.133333, 12.233333));
         //println!("{:?}, {:?}", imola, calalzo);
-        println!("{:?}", t.find_train_station_offline("bologna centrale"));
+        println!("{:?}", t.find_train_station("bologna centrale"));
         let bologna = t.find_train_station("vipiteno").unwrap();
         println!("{:?}", t.find_trips(imola, bologna, &chrono::Local::now()));/*
             .iter()
