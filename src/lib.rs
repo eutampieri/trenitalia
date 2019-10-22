@@ -459,16 +459,18 @@ impl Trenitalia {
             Some(x) => return Some(&self.stations[*x]),
             None => {
                 for station in &self.stations {
-                    let diff = utils::match_strings(&station.get_name(), &name);
-                    if cfg!(debug_assertions) {
-                        //println!("Difference between {} and {} = {}", &station.name, &name, diff);
-                    }
-                    if diff == 1.0 {
-                        return Some(station);
-                    }
-                    if diff > min_diff {
-                        min_diff = diff;
-                        found_station = station;
+                    for alias in &station.aliases {
+                        let diff = utils::match_strings(alias, &name);
+                        if cfg!(debug_assertions) {
+                            //println!("Difference between {} and {} = {}", &station.name, &name, diff);
+                        }
+                        if diff == 1.0 {
+                            return Some(station);
+                        }
+                        if diff > min_diff {
+                            min_diff = diff;
+                            found_station = station;
+                        }
                     }
                 }
                 return if min_diff >= WORDS_EQUALITY_THRESHOLD {Some(found_station)} else {None}
