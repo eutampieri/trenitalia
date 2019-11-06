@@ -31,19 +31,19 @@ mod utils {
 /// Train type and number representation
 #[derive(Debug, Clone)]
 pub enum TrainNumber{
-    Regionale(u32),
-    RegionaleVeloce(u32),
-    InterCity(u32),
-    FrecciaRossa(u32),
-    FrecciaArgento(u32),
-    FrecciaBianca(u32),
-    InterCityNotte(u32),
-    EuroNight(u32),
-    EuroCity(u32),
-    Bus(u32),
+    Regionale{number: u32},
+    RegionaleVeloce{number: u32},
+    InterCity{number: u32},
+    FrecciaRossa{number: u32},
+    FrecciaArgento{number: u32},
+    FrecciaBianca{number: u32},
+    InterCityNotte{number: u32},
+    EuroNight{number: u32},
+    EuroCity{number: u32},
+    Bus{number: u32},
     //EuroCityÖBBDB(u32),
     /// Unknown train, the second field is the train type as returned from the API
-    Unknown(u32, String),
+    Unknown{number: u32, name: String},
 }
 
 /// A specific stop in a train trip
@@ -174,26 +174,26 @@ impl Trenitalia {
     /// Builds a TrainNumber enum from the train number and train type
     fn match_train_type(&self, description: &str, number: u32) -> TrainNumber{
         let train_type = match description {
-            "RV" => TrainNumber::RegionaleVeloce(number),
-            "Regionale" => TrainNumber::Regionale(number),
-            "Frecciarossa" => TrainNumber::FrecciaRossa(number),
-            "Frecciaargento" => TrainNumber::FrecciaArgento(number),
-            "IC" => TrainNumber::InterCity(number),
-            "Frecciabianca" => TrainNumber::FrecciaBianca(number),
-            "ICN" => TrainNumber::InterCityNotte(number),
-            "EN" => TrainNumber::EuroNight(number),
-            "EC" => TrainNumber::EuroCity(number),
-            "REG" => TrainNumber::Regionale(number),
-            "Autobus" => TrainNumber::Bus(number),
-            "BUS" => TrainNumber::Bus(number),
-            "FR" => TrainNumber::FrecciaRossa(number),
-            "FA" => TrainNumber::FrecciaArgento(number),
-            "FB" => TrainNumber::FrecciaBianca(number),
-            "ECB" => TrainNumber::EuroCity(number),
-            _ => TrainNumber::Unknown(number, String::from(description)),
+            "RV" => TrainNumber::RegionaleVeloce{number: number},
+            "Regionale" => TrainNumber::Regionale{number: number},
+            "Frecciarossa" => TrainNumber::FrecciaRossa{number: number},
+            "Frecciaargento" => TrainNumber::FrecciaArgento{number: number},
+            "IC" => TrainNumber::InterCity{number: number},
+            "Frecciabianca" => TrainNumber::FrecciaBianca{number: number},
+            "ICN" => TrainNumber::InterCityNotte{number: number},
+            "EN" => TrainNumber::EuroNight{number: number},
+            "EC" => TrainNumber::EuroCity{number: number},
+            "REG" => TrainNumber::Regionale{number: number},
+            "Autobus" => TrainNumber::Bus{number: number},
+            "BUS" => TrainNumber::Bus{number: number},
+            "FR" => TrainNumber::FrecciaRossa{number: number},
+            "FA" => TrainNumber::FrecciaArgento{number: number},
+            "FB" => TrainNumber::FrecciaBianca{number: number},
+            "ECB" => TrainNumber::EuroCity{number: number},
+            _ => TrainNumber::Unknown{number: number, name: String::from(description)},
         };
         match train_type{
-            TrainNumber::Unknown(_, _) =>{
+            TrainNumber::Unknown{number: _, name: _} =>{
                 let url = format!("https://eutampieri.eu/tipi_treno.php?tipo={}", description.replace(" ", "%20"));
                 let _ = reqwest::get(url.as_str());
             },

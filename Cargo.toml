@@ -1,6 +1,6 @@
 [package]
 name = "trenitalia"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Eugenio Tampieri <eugenio.tampieri@icloud.com>"]
 edition = "2018"
 description = "A crate to get information about Trenitalia trains and stations"
