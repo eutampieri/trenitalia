@@ -25,20 +25,20 @@ impl TrainTrips{
 }
 
 // TODO Aggiungere tipi treno
-#[derive(Debug, Clone, Copy)]
-pub enum TrainType{
-    Regionale,
-    RegionaleVeloce,
-    InterCity,
-    FrecciaRossa,
-    FrecciaArgento,
-    FrecciaBianca,
-    InterCityNotte,
-    EuroNight,
-    EuroCity,
-    Bus,
-    //EuroCityÖBBDB,
-    Unknown,
+#[derive(Debug, Clone)]
+pub enum TrainNumber{
+    Regionale(u32),
+    RegionaleVeloce(u32),
+    InterCity(u32),
+    FrecciaRossa(u32),
+    FrecciaArgento(u32),
+    FrecciaBianca(u32),
+    InterCityNotte(u32),
+    EuroNight(u32),
+    EuroCity(u32),
+    Bus(u32),
+    //EuroCityÖBBDB(u32),
+    Unknown(u32, String),
 }
 
 #[derive(Debug)]
@@ -54,15 +54,13 @@ pub struct TrainTripStop {
 pub struct DetailedTrainTrip {
     pub from: TrainStation,
     pub to: TrainStation, 
-    pub train_number: String,
-    pub train_type: TrainType,
+    pub train_number: TrainNumber,
     pub stops: Vec<TrainTripStop>,
 }
 
 #[derive(Debug, Clone)]
 pub struct TrainTrip {
-    pub train_number: String,
-    pub train_type: TrainType,
+    pub train_number: TrainNumber,
     pub arrival: (TrainStation, chrono::DateTime<chrono::Local>),
     pub departure: (TrainStation, chrono::DateTime<chrono::Local>),
 }
@@ -75,8 +73,7 @@ impl TrainTrip{
     }
     pub fn from(reference: &TrainTrip) -> Self {
         TrainTrip{
-            train_number: String::from(reference.train_number.as_str()),
-            train_type: reference.train_type,
+            train_number: reference.train_number.clone(),
             arrival: (TrainStation::from(&reference.arrival.0), reference.arrival.1),
             departure: (TrainStation::from(&reference.departure.0), reference.departure.1),
         }
@@ -178,28 +175,28 @@ impl Trenitalia {
         }
         Trenitalia{stations: mapped_stations, fast_station_lookup: lookup}
     }
-    fn match_train_type(&self, description: &str) -> TrainType{
+    fn match_train_type(&self, description: &str, number: u32) -> TrainNumber{
         let train_type = match description {
-            "RV" => TrainType::RegionaleVeloce,
-            "Regionale" => TrainType::Regionale,
-            "Frecciarossa" => TrainType::FrecciaRossa,
-            "Frecciaargento" => TrainType::FrecciaArgento,
-            "IC" => TrainType::InterCity,
-            "Frecciabianca" => TrainType::FrecciaBianca,
-            "ICN" => TrainType::InterCityNotte,
-            "EN" => TrainType::EuroNight,
-            "EC" => TrainType::EuroCity,
-            "REG" => TrainType::Regionale,
-            "Autobus" => TrainType::Bus,
-            "BUS" => TrainType::Bus,
-            "FR" => TrainType::FrecciaRossa,
-            "FA" => TrainType::FrecciaArgento,
-            "FB" => TrainType::FrecciaBianca,
-            "ECB" => TrainType::EuroCity,
-            _ => TrainType::Unknown,
+            "RV" => TrainNumber::RegionaleVeloce(number),
+            "Regionale" => TrainNumber::Regionale(number),
+            "Frecciarossa" => TrainNumber::FrecciaRossa(number),
+            "Frecciaargento" => TrainNumber::FrecciaArgento(number),
+            "IC" => TrainNumber::InterCity(number),
+            "Frecciabianca" => TrainNumber::FrecciaBianca(number),
+            "ICN" => TrainNumber::InterCityNotte(number),
+            "EN" => TrainNumber::EuroNight(number),
+            "EC" => TrainNumber::EuroCity(number),
+            "REG" => TrainNumber::Regionale(number),
+            "Autobus" => TrainNumber::Bus(number),
+            "BUS" => TrainNumber::Bus(number),
+            "FR" => TrainNumber::FrecciaRossa(number),
+            "FA" => TrainNumber::FrecciaArgento(number),
+            "FB" => TrainNumber::FrecciaBianca(number),
+            "ECB" => TrainNumber::EuroCity(number),
+            _ => TrainNumber::Unknown(number, String::from(description)),
         };
         match train_type{
-            TrainType::Unknown =>{
+            TrainNumber::Unknown(_, _) =>{
                 let url = format!("https://eutampieri.eu/tipi_treno.php?tipo={}", description.replace(" ", "%20"));
                 let _ = reqwest::get(url.as_str());
             },
@@ -262,8 +259,7 @@ impl Trenitalia {
                         arrival: (TrainStation::from(to),
                             chrono::Local.datetime_from_str(train.arrivaltime.as_str(), "%+").expect("Data non valida"),
                         ),
-                        train_number: String::from(train_number),
-                        train_type: self.match_train_type(&acronym)
+                        train_number: self.match_train_type(&acronym, train_number.parse::<u32>().unwrap())
                     });
                 }
             }
@@ -365,8 +361,7 @@ impl Trenitalia {
                     arrival: (TrainStation::from(to),
                         chrono::Local.datetime_from_str(train_trip.orarioArrivo.as_str(), "%FT%T").expect("Data non valida"),
                     ),
-                    train_number: String::from(train_trip.numeroTreno.as_str()),
-                    train_type: self.match_train_type(&train_trip.categoriaDescrizione)
+                    train_number: self.match_train_type(&train_trip.categoriaDescrizione, train_trip.numeroTreno.parse::<u32>().unwrap())
                 });
             }
             if cfg!(debug_assertions) {
