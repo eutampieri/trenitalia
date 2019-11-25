@@ -1,4 +1,5 @@
 use chrono::prelude::*;
+use serde::{Serialize, Deserialize};
 
 mod mapping;
 
@@ -57,6 +58,17 @@ pub struct TrainTripStop {
     pub expected_departure: Option<chrono::DateTime<chrono::Local>>,
 }
 
+/// A specific stop in a train trip
+#[derive(Debug)]
+pub struct DetailedTrainTripStop {
+    pub station: TrainStation,
+    pub platform: String,
+    pub arrival: Option<chrono::DateTime<chrono::Local>>,
+    pub departure: Option<chrono::DateTime<chrono::Local>>,
+    pub expected_arrival: Option<chrono::DateTime<chrono::Local>>,
+    pub expected_departure: Option<chrono::DateTime<chrono::Local>>,
+}
+
 /// A train trip with stops specified
 pub struct DetailedTrainTrip {
     pub from: TrainStation,
@@ -84,8 +96,58 @@ impl TrainTrip{
     }
 }
 
+#[derive(Debug)]
+pub struct TrainInfo {
+    pub current_station: TrainStation,
+    pub current_delay: i16,
+    pub is_at_station: bool,
+    pub stops: Vec<DetailedTrainTripStop>,
+}
+
+impl TrainInfo {
+    pub fn from(vtvec: &Vec<mapping::VTDetailedTrainTripLeg>, trenitalia: &Trenitalia) -> Self {
+        let mut delay: i16 = 0;
+        let mut current_station: TrainStation = trenitalia.find_train_station(&vtvec[&vtvec.len()-1].stazione).unwrap().clone();
+        let mut in_station: bool = false;
+        let mut stations_list: Vec<DetailedTrainTripStop> = Vec::new();
+        for stop in vtvec {
+            let this_station = trenitalia.find_train_station(&stop.stazione).unwrap();
+            if stop.stazioneCorrente {
+                current_station = this_station.clone();
+                if let Some(r) = stop.fermata.partenzaReale { 
+                    if let Some(t) = stop.fermata.partenza_teorica{
+                        delay = ((r as i64 - t as i64)/60000i64) as i16;
+                    }
+                } else if let Some(t) = stop.fermata.partenza_teorica {
+                    delay = (((chrono::Local::now().timestamp_millis() - t as i64)/60000i64) as i16).max(0);
+                }
+                if stop.fermata.arrivoReale.is_some() && stop.fermata.partenzaReale.is_none() {
+                    // If the train has arrived but not departed yet
+                    in_station = true;
+                }
+            }
+            let this_stop = DetailedTrainTripStop{
+                arrival: stop.fermata.arrivoReale.map(|ts| chrono::Local.timestamp((ts/1000) as i64, 0)),
+                departure: stop.fermata.partenzaReale.map(|ts| chrono::Local.timestamp((ts/1000) as i64, 0)),
+                expected_arrival: stop.fermata.arrivo_teorico.map(|ts| chrono::Local.timestamp((ts/1000) as i64, 0)),
+                expected_departure: stop.fermata.partenza_teorica.map(|ts| chrono::Local.timestamp((ts/1000) as i64, 0)),
+                platform: stop.fermata.binarioEffettivoPartenzaDescrizione.as_ref().unwrap_or(
+                    stop.fermata.binarioProgrammatoPartenzaDescrizione.as_ref().unwrap_or(
+                        stop.fermata.binarioEffettivoArrivoDescrizione.as_ref().unwrap_or(
+                            stop.fermata.binarioProgrammatoArrivoDescrizione.as_ref().unwrap()
+                        )
+                    )
+                ).to_string(),
+                station: this_station.clone()
+            };
+            stations_list.push(this_stop);
+        }
+        TrainInfo{current_delay: delay, is_at_station: in_station, current_station: current_station, stops: stations_list}
+    }
+}
+
 /// Struct that holds the train station data
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TrainStation {
     /// Three-charachters ID
     pub id: String,
@@ -476,10 +538,16 @@ impl Trenitalia {
     }
 
     /// Get train details from ViaggiaTreno
-    fn train_info_raw(&self, number: &str, from: &str){}
+    fn train_info_raw(&self, number: &str, from: &str) -> TrainInfo {
+        let url = format!("http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/tratteCanvas/{}/{}", from, number);
+        println!("{}", url);
+        let response: Vec<mapping::VTDetailedTrainTripLeg> = reqwest::get(&url).unwrap().json().unwrap();
+        println!("{:?}", response[0]);
+        TrainInfo::from(&response, self)
+    }
 
     /// Get train details, provided that you know the originating station
-    pub fn train_info(&self, number: &str, from: String) {
+    pub fn train_info(&self, number: &str, from: String) -> Result<TrainInfo, &str> {
         let url = format!("http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaNumeroTrenoTrenoAutocomplete/{}", number);
         let response = reqwest::get(&url).unwrap().text().unwrap();
         let body: Vec<Vec<&str>> = response.trim_end_matches('\n')
@@ -488,7 +556,7 @@ impl Trenitalia {
         let train_station_of_origination: &str = match body.len() {
             1 => body[0][1].split('-').collect::<Vec<&str>>()[1],
             0 => {
-                unimplemented!();
+                return Err("No train found");
             },
             _ => {
                 let mut station_code = "";
@@ -506,34 +574,36 @@ impl Trenitalia {
                         break;
                     }
                 }
-                if min_diff == 0.0 {unimplemented!()} else {station_code}
+                if min_diff == 0.0 {return Err("Train not found");} else {station_code}
             }
         };
-        self.train_info_raw(number, train_station_of_origination)
+        Ok(self.train_info_raw(number, train_station_of_origination))
     }
 
     /// Get train details, knowing that it calls at a certain station
-    pub fn train_info_calling_at(&self, number: &str, calling_at: &TrainStation) {
+    pub fn train_info_calling_at(&self, number: &str, calling_at: &TrainStation) -> Result<TrainInfo, &str> {
         let url = format!("http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaNumeroTrenoTrenoAutocomplete/{}", number);
         let response = reqwest::get(&url).unwrap().text().unwrap();
         let body: Vec<Vec<&str>> = response.trim_end_matches('\n')
         .split("\n").collect::<Vec<&str>>().iter()
         .map(|&x| x.split("|").collect::<Vec<&str>>()).collect();
-        let train_station_of_origination: &str = match body.len() {
-            1 => body[0][1].split('-').collect::<Vec<&str>>()[1],
+        match body.len() {
+            1 => Ok(self.train_info_raw(number, body[0][1].split('-').collect::<Vec<&str>>()[1])),
             0 => {
-                unimplemented!();
+                Err("Train not found")
             },
             _ => {
-                let mut station_code = "";
-                let mut min_diff = 0.0;
                 for option in body {
-                    //
+                    let train_info = self.train_info_raw(number, option[1].split('-').collect::<Vec<&str>>()[1]);
+                    for stop in &train_info.stops {
+                        if stop.station.id == calling_at.id {
+                            return Ok(train_info);
+                        }
+                    }
                 }
-                "123"
+                return Err("Train not found");
             }
-        };
-        self.train_info_raw(number, train_station_of_origination)
+        }
     }
     /// Finds the nearest station from a point
     pub fn nearest_station(&self, point: (f64,f64)) -> &TrainStation {
@@ -567,15 +637,16 @@ mod tests {
         let _calalzo = t.nearest_station((46.45, 12.383333));
         let _carnia = t.nearest_station((46.374318, 13.134141));
         let imola = t.nearest_station((44.3533, 11.7141));
-        let _cesena = t.nearest_station((44.133333, 12.233333));
+        let cesena = t.nearest_station((44.133333, 12.233333));
         //println!("{:?}, {:?}", imola, calalzo);
         println!("{:?}", t.find_train_station("bologna centrale"));
-        let bologna = t.find_train_station("vipiteno").unwrap();
-        println!("{:?}", t.find_trips(imola, bologna, &chrono::Local::now()));/*
+        let _bologna = t.find_train_station("vipiteno").unwrap();
+        println!("{:?}", t.find_trips(cesena, imola, &chrono::Local::now()));/*
             .iter()
             .map(|x| TrainTrips(x.to_vec()).get_duration())
             .collect::<Vec<chrono::Duration>>()
         );*/
+        println!("{:?}", t.train_info("11536", "Piacenza".to_string()).unwrap());
     }
 
     /*#[test]
