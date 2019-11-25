@@ -134,7 +134,7 @@ impl TrainInfo {
                 platform: stop.fermata.binarioEffettivoPartenzaDescrizione.as_ref().unwrap_or(
                     stop.fermata.binarioProgrammatoPartenzaDescrizione.as_ref().unwrap_or(
                         stop.fermata.binarioEffettivoArrivoDescrizione.as_ref().unwrap_or(
-                            stop.fermata.binarioProgrammatoArrivoDescrizione.as_ref().unwrap()
+                            stop.fermata.binarioProgrammatoArrivoDescrizione.as_ref().unwrap_or(&"?".to_string())
                         )
                     )
                 ).to_string(),
@@ -540,9 +540,7 @@ impl Trenitalia {
     /// Get train details from ViaggiaTreno
     fn train_info_raw(&self, number: &str, from: &str) -> TrainInfo {
         let url = format!("http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/tratteCanvas/{}/{}", from, number);
-        println!("{}", url);
         let response: Vec<mapping::VTDetailedTrainTripLeg> = reqwest::get(&url).unwrap().json().unwrap();
-        println!("{:?}", response[0]);
         TrainInfo::from(&response, self)
     }
 
@@ -646,7 +644,7 @@ mod tests {
             .map(|x| TrainTrips(x.to_vec()).get_duration())
             .collect::<Vec<chrono::Duration>>()
         );*/
-        println!("{:?}", t.train_info("11536", "Piacenza".to_string()).unwrap());
+        println!("{:?}", t.train_info("6568", "Piacenza".to_string()).unwrap());
     }
 
     /*#[test]
