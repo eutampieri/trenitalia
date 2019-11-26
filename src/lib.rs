@@ -80,7 +80,7 @@ impl std::convert::From<&TrainNumber> for u32{
             TrainNumber::EuroNight{number} => number,
             TrainNumber::EuroCity{number} => number,
             TrainNumber::Bus{number} => number,
-            TrainNumber::Unknown{number, name} => number,
+            TrainNumber::Unknown{number, name: _} => number,
         }
     }
 }
