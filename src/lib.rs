@@ -132,6 +132,23 @@ impl TrainTrip{
         let arrivo = (&self.arrival.1).clone();
         arrivo.signed_duration_since(partenza)
     }
+    /// This method returns the trip's fare
+    pub fn get_fare(&self) -> Option<f64> {
+        let url = format!("https://www.lefrecce.it/msite/api/solutions?origin={}&destination={}&arflag=A&adate={}&atime={}&adultno=1&childno=0&direction=A&frecce=false&onlyRegional=false",
+            self.departure.0.lefrecce_name.clone().unwrap().replace(" ", "%20"),
+            self.arrival.0.lefrecce_name.clone().unwrap().replace(" ", "%20"),
+            self.departure.1.format("%d/%m/%Y"),
+            self.departure.1.format("%H")
+        );
+        let body: Vec<mapping::LFSolution> = reqwest::get(url.as_str()).unwrap().json().unwrap();
+        for result in body {
+            if chrono::Local.timestamp_millis(result.departuretime as i64) == self.departure.1 &&
+                chrono::Local.timestamp_millis(result.arrivaltime as i64) == self.arrival.1 {
+                return result.minprice;
+            }
+        }
+        None
+    }
 }
 
 #[derive(Debug)]
@@ -682,6 +699,7 @@ mod tests {
             .map(|x| TrainTrips(x.to_vec()).get_duration())
             .collect::<Vec<chrono::Duration>>()
         );*/
+        println!("{:?}", t.find_trips(cesena, imola, &chrono::Local::now())[0][0].get_fare());
         let a = TrainNumber::EuroCity{number: 2019};
         a.to_string();
         println!("{:?}", t.train_info(6568, "Piacenza".to_string()).unwrap());
