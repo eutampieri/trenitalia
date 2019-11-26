@@ -46,6 +46,44 @@ pub enum TrainNumber{
     /// Unknown train, the second field is the train type as returned from the API
     Unknown{number: u32, name: String},
 }
+impl std::string::ToString for TrainNumber {
+    fn to_string(&self) -> String {
+        format!(
+            "{}{}",
+            match self {
+                Self::Regionale{number: _} => "R",
+                Self::RegionaleVeloce{number: _} => "RV",
+                Self::InterCity{number: _} => "IC",
+                Self::FrecciaRossa{number: _} => "ES*FR",
+                Self::FrecciaArgento{number: _} => "ES*FA",
+                Self::FrecciaBianca{number: _} => "FB",
+                Self::InterCityNotte{number: _} => "ICN",
+                Self::EuroNight{number: _} => "EN",
+                Self::EuroCity{number: _} => "EC",
+                Self::Bus{number: _} => "BUS",
+                Self::Unknown{number: _, name: _} => "?"
+            },
+            u32::from(self)
+        )
+    }
+}
+impl std::convert::From<&TrainNumber> for u32{
+    fn from(from: &TrainNumber) -> Self {
+        *match from {
+            TrainNumber::Regionale{number} => number,
+            TrainNumber::RegionaleVeloce{number} => number,
+            TrainNumber::InterCity{number} => number,
+            TrainNumber::FrecciaRossa{number} => number,
+            TrainNumber::FrecciaArgento{number} => number,
+            TrainNumber::FrecciaBianca{number} => number,
+            TrainNumber::InterCityNotte{number} => number,
+            TrainNumber::EuroNight{number} => number,
+            TrainNumber::EuroCity{number} => number,
+            TrainNumber::Bus{number} => number,
+            TrainNumber::Unknown{number, name} => number,
+        }
+    }
+}
 
 /// A specific stop in a train trip
 #[derive(Debug)]
@@ -538,14 +576,14 @@ impl Trenitalia {
     }
 
     /// Get train details from ViaggiaTreno
-    fn train_info_raw(&self, number: &str, from: &str) -> TrainInfo {
+    fn train_info_raw(&self, number: u32, from: &str) -> TrainInfo {
         let url = format!("http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/tratteCanvas/{}/{}", from, number);
         let response: Vec<mapping::VTDetailedTrainTripLeg> = reqwest::get(&url).unwrap().json().unwrap();
         TrainInfo::from(&response, self)
     }
 
     /// Get train details, provided that you know the originating station
-    pub fn train_info(&self, number: &str, from: String) -> Result<TrainInfo, &str> {
+    pub fn train_info(&self, number: u32, from: String) -> Result<TrainInfo, &str> {
         let url = format!("http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaNumeroTrenoTrenoAutocomplete/{}", number);
         let response = reqwest::get(&url).unwrap().text().unwrap();
         let body: Vec<Vec<&str>> = response.trim_end_matches('\n')
@@ -579,7 +617,7 @@ impl Trenitalia {
     }
 
     /// Get train details, knowing that it calls at a certain station
-    pub fn train_info_calling_at(&self, number: &str, calling_at: &TrainStation) -> Result<TrainInfo, &str> {
+    pub fn train_info_calling_at(&self, number: u32, calling_at: &TrainStation) -> Result<TrainInfo, &str> {
         let url = format!("http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaNumeroTrenoTrenoAutocomplete/{}", number);
         let response = reqwest::get(&url).unwrap().text().unwrap();
         let body: Vec<Vec<&str>> = response.trim_end_matches('\n')
@@ -644,7 +682,9 @@ mod tests {
             .map(|x| TrainTrips(x.to_vec()).get_duration())
             .collect::<Vec<chrono::Duration>>()
         );*/
-        println!("{:?}", t.train_info("6568", "Piacenza".to_string()).unwrap());
+        let a = TrainNumber::EuroCity{number: 2019};
+        a.to_string();
+        println!("{:?}", t.train_info(6568, "Piacenza".to_string()).unwrap());
     }
 
     /*#[test]
