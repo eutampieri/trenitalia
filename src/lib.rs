@@ -479,7 +479,9 @@ impl Trenitalia {
                     arrival: (to.clone(),
                         chrono::Local.datetime_from_str(train_trip.orarioArrivo.as_str(), "%FT%T").expect("Data non valida"),
                     ),
-                    train_number: self.match_train_type(&train_trip.categoriaDescrizione, train_trip.numeroTreno.parse::<u32>().unwrap())
+                    train_number: self.match_train_type(&train_trip.categoriaDescrizione, train_trip.numeroTreno.parse::<u32>().unwrap_or(
+                        train_trip.numeroTreno.chars().into_iter().map(|x| if x.is_digit(10){x} else{'0'}).collect::<String>().parse::<u32>().unwrap())
+                    )
                 });
             }
             if cfg!(debug_assertions) {
@@ -695,8 +697,8 @@ mod tests {
         let cesena = t.nearest_station((44.133333, 12.233333));
         //println!("{:?}, {:?}", imola, calalzo);
         println!("{:?}", t.find_train_station("bologna centrale"));
-        let _bologna = t.find_train_station("vipiteno").unwrap();
-        println!("{:?}", t.find_trips(cesena, imola, &chrono::Local::now()));/*
+        let _bologna = t.find_train_station("marradi").unwrap();
+        println!("{:?}", t.find_trips(imola, _bologna, &chrono::Local::now()));/*
             .iter()
             .map(|x| TrainTrips(x.to_vec()).get_duration())
             .collect::<Vec<chrono::Duration>>()
