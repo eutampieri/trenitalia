@@ -374,7 +374,9 @@ impl Trenitalia {
                         arrival: (to.clone(),
                             chrono::Local.datetime_from_str(train.arrivaltime.as_str(), "%+").expect("Data non valida"),
                         ),
-                        train_number: self.match_train_type(&acronym, train_number.parse::<u32>().unwrap())
+                        train_number: self.match_train_type(&acronym, train_number.parse::<u32>().unwrap_or(
+                            train_number.chars().into_iter().map(|x| if x.is_digit(10){x} else{'0'}).collect::<String>().parse::<u32>().unwrap()
+                        ))
                     });
                 }
             }
