@@ -1,6 +1,6 @@
 [package]
 name = "trenitalia"
-version = "0.3.3"
+version = "0.3.4"
 authors = ["Eugenio Tampieri <eugenio.tampieri@icloud.com>"]
 edition = "2018"
 description = "A crate to get information about Trenitalia trains and stations"
@@ -10,7 +10,7 @@ repository = "https://github.com/eutampieri/trenitalia"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-ureq = {version = "0.11", features = ["json"]}
+ureq = {version = "0.11", features = ["default", "json"]}
 serde = {version = "1.0", features = ["derive"]}
 serde_json = "1.0"
 chrono = "0.4"
