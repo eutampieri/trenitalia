@@ -140,7 +140,8 @@ impl TrainTrip{
             self.departure.1.format("%d/%m/%Y"),
             self.departure.1.format("%H")
         );
-        let body: Vec<mapping::LFSolution> = reqwest::get(url.as_str()).unwrap().json().unwrap();
+        let answer = ureq::get(url.as_str()).call().into_string().unwrap();
+        let body: Vec<mapping::LFSolution> = serde_json::from_str(&answer).unwrap();
         for result in body {
             if chrono::Local.timestamp_millis(result.departuretime as i64) == self.departure.1 &&
                 chrono::Local.timestamp_millis(result.arrivaltime as i64) == self.arrival.1 {
@@ -312,7 +313,7 @@ impl Trenitalia {
         match train_type{
             TrainNumber::Unknown{number: _, name: _} =>{
                 let url = format!("https://eutampieri.eu/tipi_treno.php?tipo={}", description.replace(" ", "%20"));
-                let _ = reqwest::get(url.as_str());
+                let _ = ureq::get(url.as_str()).call();
             },
             _ => {}
         }
@@ -324,10 +325,7 @@ impl Trenitalia {
             return vec![];
         }
         let mut result: Vec<Vec<TrainTrip>> = Vec::new();
-        let client = reqwest::Client::builder()
-            .cookie_store(true)
-            .build()
-            .unwrap();
+        let client = ureq::agent();
         let url = format!("https://www.lefrecce.it/msite/api/solutions?origin={}&destination={}&arflag=A&adate={}&atime={}&adultno=1&childno=0&direction=A&frecce=false&onlyRegional=false",
             from.lefrecce_name.clone().unwrap().replace(" ", "%20"),
             to.lefrecce_name.clone().unwrap().replace(" ", "%20"),
@@ -337,14 +335,14 @@ impl Trenitalia {
         if cfg!(debug_assertions) {
             println!("{}", url);
         }
-        let body: Vec<mapping::LFSolution> = client.get(url.as_str()).send().unwrap().json().unwrap();
+        let body: Vec<mapping::LFSolution> = serde_json::from_value(client.get(url.as_str()).call().into_json().unwrap()).unwrap();
         for solution in &body {
             let mut train_trips: Vec<TrainTrip> = Vec::new();
             let url_details = format!("https://www.lefrecce.it/msite/api/solutions/{}/standardoffers", solution.idsolution);
             if cfg!(debug_assertions) {
                 println!("{}", url_details);
             }
-            let body_details: mapping::LFDetailedSolution = client.get(url_details.as_str()).send().unwrap().json().unwrap();
+            let body_details: mapping::LFDetailedSolution = serde_json::from_value(client.get(url_details.as_str()).call().into_json().unwrap()).unwrap();
             for leg in &body_details.leglist {
                 for train in &leg.segments {
                     if train.trainidentifier == String::from("Same") {
@@ -357,14 +355,14 @@ impl Trenitalia {
                     *self.fast_station_lookup.get(&train.departurestation.to_uppercase())
                     .or_else(|| {
                         let url = format!("https://eutampieri.eu/fix_localita.php?nome={}", &train.departurestation);
-                        let _ = reqwest::get(url.as_str());
+                        let _ = ureq::get(url.as_str()).call();
                         None
                     }).expect("Inconsistency in Trenitalia")];
                     let to = &self.stations[
                     *self.fast_station_lookup.get(&train.arrivalstation.to_uppercase())
                     .or_else(|| {
                         let url = format!("https://eutampieri.eu/fix_localita.php?nome={}", &train.arrivalstation);
-                        let _ = reqwest::get(url.as_str());
+                        let _ = ureq::get(url.as_str()).call();
                         None
                     }).expect("Inconsistency in Trenitalia")];
                     train_trips.push(TrainTrip{
@@ -398,7 +396,7 @@ impl Trenitalia {
         if cfg!(debug_assertions) {
             println!("{}", url);
         }
-        let body: mapping::VTJourneySearchResult = reqwest::get(url.as_str()).unwrap().json().unwrap();
+        let body: mapping::VTJourneySearchResult = serde_json::from_value(ureq::get(url.as_str()).call().into_json().unwrap()).unwrap();
         if body.soluzioni.len() == 0{
             return self.find_trips_lefrecce(from, to, when);
         }
@@ -422,7 +420,7 @@ impl Trenitalia {
                         soluzione.vehicles[0].origine.as_ref().unwrap_or(&String::from("")))
                     .or_else(|| {
                         let url = format!("https://eutampieri.eu/fix_localita.php?nome={}", soluzione.vehicles[0].origine.as_ref().unwrap_or(&String::from("")));
-                        let _ = reqwest::get(url.as_str());
+                        let _ = ureq::get(url.as_str()).call();
                         None
                     }).expect("Inconsistency in Trenitalia")];
                 if cfg!(debug_assertions) {
@@ -447,7 +445,7 @@ impl Trenitalia {
                         train_trip.origine.as_ref().unwrap_or(&String::from("")))
                     .or_else(|| {
                         let url = format!("https://eutampieri.eu/fix_localita.php?nome={}", train_trip.origine.as_ref().unwrap_or(&String::from("")));
-                        let _ = reqwest::get(url.as_str());
+                        let _ = ureq::get(url.as_str()).call();
                         None
                     }).expect("Inconsistency in Trenitalia")];
                 let to = &self.stations[
@@ -455,7 +453,7 @@ impl Trenitalia {
                         train_trip.destinazione.as_ref().unwrap_or(&String::from("")))
                     .or_else(|| {
                         let url = format!("https://eutampieri.eu/fix_localita.php?nome={}", train_trip.destinazione.as_ref().unwrap_or(&String::from("")));
-                        let _ = reqwest::get(url.as_str());
+                        let _ = ureq::get(url.as_str()).call();
                         None
                     }).expect("Inconsistency in Trenitalia")];
                 if old_to.is_some() && old_to!=Some(&from.get_name()){
@@ -502,7 +500,7 @@ impl Trenitalia {
                         soluzione.vehicles[&soluzione.vehicles.len()-1].destinazione.as_ref().unwrap_or(&String::from("")))
                     .or_else(|| {
                         let url = format!("https://eutampieri.eu/fix_localita.php?nome={}", soluzione.vehicles[&soluzione.vehicles.len()-1].destinazione.as_ref().unwrap_or(&String::from("")));
-                        let _ = reqwest::get(url.as_str());
+                        let _ = ureq::get(url.as_str()).call();
                         None
                     }).expect("Inconsistency in Trenitalia")];
                 if cfg!(debug_assertions) {
@@ -530,7 +528,7 @@ impl Trenitalia {
         if cfg!(debug_assertions) {
             println!("{}", url);
         }
-        let response = reqwest::get(&url).unwrap().text().unwrap();
+        let response = ureq::get(&url).call().into_string().unwrap();
         if response.len() == 0 {
             return None;
         }
@@ -599,14 +597,14 @@ impl Trenitalia {
     /// Get train details from ViaggiaTreno
     fn train_info_raw(&self, number: u32, from: &str) -> TrainInfo {
         let url = format!("http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/tratteCanvas/{}/{}", from, number);
-        let response: Vec<mapping::VTDetailedTrainTripLeg> = reqwest::get(&url).unwrap().json().unwrap();
+        let response: Vec<mapping::VTDetailedTrainTripLeg> = serde_json::from_value(ureq::get(&url).call().into_json().unwrap()).unwrap();
         TrainInfo::from(&response, self)
     }
 
     /// Get train details, provided that you know the originating station
     pub fn train_info(&self, number: u32, from: String) -> Result<TrainInfo, &str> {
         let url = format!("http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaNumeroTrenoTrenoAutocomplete/{}", number);
-        let response = reqwest::get(&url).unwrap().text().unwrap();
+        let response = ureq::get(&url).call().into_string().unwrap();
         let body: Vec<Vec<&str>> = response.trim_end_matches('\n')
         .split("\n").collect::<Vec<&str>>().iter()
         .map(|&x| x.split("|").collect::<Vec<&str>>()).collect();
@@ -640,7 +638,7 @@ impl Trenitalia {
     /// Get train details, knowing that it calls at a certain station
     pub fn train_info_calling_at(&self, number: u32, calling_at: &TrainStation) -> Result<TrainInfo, &str> {
         let url = format!("http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaNumeroTrenoTrenoAutocomplete/{}", number);
-        let response = reqwest::get(&url).unwrap().text().unwrap();
+        let response = ureq::get(&url).call().into_string().unwrap();
         let body: Vec<Vec<&str>> = response.trim_end_matches('\n')
         .split("\n").collect::<Vec<&str>>().iter()
         .map(|&x| x.split("|").collect::<Vec<&str>>()).collect();
