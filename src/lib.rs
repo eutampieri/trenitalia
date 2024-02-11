@@ -550,7 +550,7 @@ impl Trenitalia {
         when: &chrono::DateTime<chrono::Local>,
     ) -> Vec<Vec<TrainTrip>> {
         let mut result: Vec<Vec<TrainTrip>> = Vec::new();
-        let url = format!("http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/soluzioniViaggioNew/{}/{}/{}",
+        let url = format!("http://www.viaggiatreno.it/infomobilita/resteasy/viaggiatreno/soluzioniViaggioNew/{}/{}/{}",
             from.short_id().unwrap(),
             to.short_id().unwrap(),
             when.format("%FT%T")
@@ -799,7 +799,10 @@ impl Trenitalia {
     /// Call to the ViaggiaTreno station lookup API
     pub fn find_train_station_online(&self, name: &str) -> Option<&TrainStation> {
         //return Some(&self.stations[0]);
-        let url = format!("http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/autocompletaStazione/{}", name);
+        let url = format!(
+            "http://www.viaggiatreno.it/infomobilita/resteasy/viaggiatreno/autocompletaStazione/{}",
+            name
+        );
         if cfg!(debug_assertions) {
             println!("{}", url);
         }
@@ -884,7 +887,7 @@ impl Trenitalia {
     /// Get train details from ViaggiaTreno
     fn train_info_raw(&self, number: u32, from: &str) -> TrainInfo {
         let url = format!(
-            "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/tratteCanvas/{}/{}",
+            "http://www.viaggiatreno.it/infomobilita/resteasy/viaggiatreno/tratteCanvas/{}/{}",
             from, number
         );
         let response: Vec<mapping::VTDetailedTrainTripLeg> = serde_json::from_value(
@@ -900,7 +903,7 @@ impl Trenitalia {
 
     /// Get train details, provided that you know the originating station
     pub fn train_info(&self, number: u32, from: String) -> Result<TrainInfo, &str> {
-        let url = format!("http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaNumeroTrenoTrenoAutocomplete/{}", number);
+        let url = format!("http://www.viaggiatreno.it/infomobilita/resteasy/viaggiatreno/cercaNumeroTrenoTrenoAutocomplete/{}", number);
         let response = ureq::get(&url)
             .call()
             .expect("Failed API call")
@@ -952,7 +955,7 @@ impl Trenitalia {
         number: u32,
         calling_at: &TrainStation,
     ) -> Result<TrainInfo, &str> {
-        let url = format!("http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaNumeroTrenoTrenoAutocomplete/{}", number);
+        let url = format!("http://www.viaggiatreno.it/infomobilita/resteasy/viaggiatreno/cercaNumeroTrenoTrenoAutocomplete/{}", number);
         let response = ureq::get(&url)
             .call()
             .expect("Failed API call")
