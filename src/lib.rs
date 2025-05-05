@@ -2,6 +2,8 @@ use chrono::prelude::*;
 use serde::{Deserialize, Serialize};
 
 mod mapping;
+mod utils;
+
 #[cfg(test)]
 mod tests;
 
@@ -10,16 +12,6 @@ static WORDS_EQUALITY_THRESHOLD: f64 = 0.70;
 //pub struct TrainTrips(Vec<TrainTrip>);
 
 /// Module which contains utilities
-mod utils {
-    /// This function returns the normalized typing distance between two strings
-    pub fn match_strings(first: &str, second: &str) -> f64 {
-        if first.to_lowercase() == second.to_lowercase() {
-            1.0
-        } else {
-            strsim::normalized_damerau_levenshtein(&first.to_lowercase(), &second.to_lowercase())
-        }
-    }
-}
 
 /*impl TrainTrips{
     /// This method calculates the total duration of a trip
@@ -29,7 +21,6 @@ mod utils {
         arrivo.signed_duration_since(partenza)
     }
 }*/
-
 // TODO Aggiungere tipi treno
 /// Train type and number representation
 #[derive(Debug, Clone)]
