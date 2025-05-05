@@ -259,7 +259,7 @@ pub struct TrainStation {
 
 impl TrainStation {
     /// Get the short version of ViaggiaTreno ID
-    fn short_id(&self) -> Option<String> {
+    pub fn short_id(&self) -> Option<String> {
         match &self.vt_id {
             None => None,
             Some(x) => Some(str::replace(x, "S", "").parse::<u16>().unwrap().to_string()),
