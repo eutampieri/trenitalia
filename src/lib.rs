@@ -139,16 +139,6 @@ impl Trenitalia {
                 name: String::from(description),
             },
         };
-        match train_type {
-            TrainNumber::Unknown { number: _, name: _ } => {
-                let url = format!(
-                    "https://eutampieri.eu/tipi_treno.php?tipo={}",
-                    description.replace(" ", "%20")
-                );
-                let _ = ureq::get(url.as_str()).call();
-            }
-            _ => {}
-        }
         train_type
     }
     /// Find a trip between two stations using LeFrecce API
@@ -213,26 +203,10 @@ impl Trenitalia {
                     let from = &self.stations[*self
                         .fast_station_lookup
                         .get(&train.departurestation.to_uppercase())
-                        .or_else(|| {
-                            let url = format!(
-                                "https://eutampieri.eu/fix_localita.php?nome={}",
-                                &train.departurestation
-                            );
-                            let _ = ureq::get(url.as_str()).call();
-                            None
-                        })
                         .expect("Inconsistency in Trenitalia")];
                     let to = &self.stations[*self
                         .fast_station_lookup
                         .get(&train.arrivalstation.to_uppercase())
-                        .or_else(|| {
-                            let url = format!(
-                                "https://eutampieri.eu/fix_localita.php?nome={}",
-                                &train.arrivalstation
-                            );
-                            let _ = ureq::get(url.as_str()).call();
-                            None
-                        })
                         .expect("Inconsistency in Trenitalia")];
                     train_trips.push(TrainTrip {
                         departure: (
@@ -332,17 +306,6 @@ impl Trenitalia {
                             .as_ref()
                             .unwrap_or(&String::from("")),
                     )
-                    .or_else(|| {
-                        let url = format!(
-                            "https://eutampieri.eu/fix_localita.php?nome={}",
-                            soluzione.vehicles[0]
-                                .origine
-                                .as_ref()
-                                .unwrap_or(&String::from(""))
-                        );
-                        let _ = ureq::get(url.as_str()).call();
-                        None
-                    })
                     .expect("Inconsistency in Trenitalia")];
                 if cfg!(debug_assertions) {
                     println!("filling_to = {:?}", filling_to);
@@ -373,14 +336,6 @@ impl Trenitalia {
                 let from = &self.stations[*self
                     .fast_station_lookup
                     .get(train_trip.origine.as_ref().unwrap_or(&String::from("")))
-                    .or_else(|| {
-                        let url = format!(
-                            "https://eutampieri.eu/fix_localita.php?nome={}",
-                            train_trip.origine.as_ref().unwrap_or(&String::from(""))
-                        );
-                        let _ = ureq::get(url.as_str()).call();
-                        None
-                    })
                     .expect("Inconsistency in Trenitalia")];
                 let to = &self.stations[*self
                     .fast_station_lookup
@@ -390,17 +345,6 @@ impl Trenitalia {
                             .as_ref()
                             .unwrap_or(&String::from("")),
                     )
-                    .or_else(|| {
-                        let url = format!(
-                            "https://eutampieri.eu/fix_localita.php?nome={}",
-                            train_trip
-                                .destinazione
-                                .as_ref()
-                                .unwrap_or(&String::from(""))
-                        );
-                        let _ = ureq::get(url.as_str()).call();
-                        None
-                    })
                     .expect("Inconsistency in Trenitalia")];
                 if old_to.is_some() && old_to != Some(&from.get_name()) {
                     let filling_solutions = self.find_trips_lefrecce(&old_to_stn, from, &old_ts);
@@ -484,17 +428,6 @@ impl Trenitalia {
                             .as_ref()
                             .unwrap_or(&String::from("")),
                     )
-                    .or_else(|| {
-                        let url = format!(
-                            "https://eutampieri.eu/fix_localita.php?nome={}",
-                            soluzione.vehicles[&soluzione.vehicles.len() - 1]
-                                .destinazione
-                                .as_ref()
-                                .unwrap_or(&String::from(""))
-                        );
-                        let _ = ureq::get(url.as_str()).call();
-                        None
-                    })
                     .expect("Inconsistency in Trenitalia")];
                 if cfg!(debug_assertions) {
                     println!("filling_from = {:?}", filling_from);
