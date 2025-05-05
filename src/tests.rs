@@ -29,31 +29,3 @@ fn test() {
     a.to_string();
     println!("{:?}", t.train_info(6568, "Piacenza".to_string()).unwrap());
 }
-
-/*#[test]
-fn test_bastardissimo(){
-    let class = std::env::var("CLASS_BASTARDA").unwrap().parse::<usize>().unwrap();
-    let t = Trenitalia::new();
-    let station_list_tsv = include_str!("../stazioni_coord.tsv");
-    let station_list = station_list_tsv.split("\n").collect::<Vec<&str>>();
-    let mapped_stations: Vec<super::TrainStation> = station_list.iter()
-        .map(|&x| x.split("\t").collect::<Vec<&str>>())
-        .collect::<Vec<Vec<&str>>>().iter()
-        .map(|x|  super::TrainStation{id: String::from(x[1]), aliases: vec![String::from(x[0])], position: Coord{
-            lat: x[3].parse::<f64>().unwrap(),
-            lon: x[4].parse::<f64>().unwrap()
-        }, region_id: x[2].parse::<u8>().unwrap()}).collect();
-    let start = mapped_stations.len()as f64*(class-1)as f64/100.0;
-    let end = mapped_stations.len()as f64*class as f64/100.0;
-    for i in start as usize..end as usize {
-        let from = &mapped_stations[i];
-        for to in &mapped_stations {
-            if from.id == to.id {
-                continue;
-            }
-            println!("Trip from {} to {}", from.get_name(), to.get_name());
-            let res = t.find_trips(from, to, &chrono::Local::now());
-            drop(res);
-        }
-    }
-}*/
