@@ -8,7 +8,7 @@ mod utils;
 #[cfg(test)]
 mod tests;
 
-static WORDS_EQUALITY_THRESHOLD: f64 = 0.70;
+const WORDS_EQUALITY_THRESHOLD: f64 = 0.70;
 
 //pub struct TrainTrips(Vec<TrainTrip>);
 
