@@ -2,6 +2,7 @@ use chrono::prelude::*;
 use serde::{Deserialize, Serialize};
 
 mod mapping;
+#[macro_use]
 mod utils;
 
 #[cfg(test)]
@@ -879,9 +880,10 @@ impl Trenitalia {
 
     /// Get train details from ViaggiaTreno
     fn train_info_raw(&self, number: u32, from: &str) -> TrainInfo {
-        let url = format!(
-            "http://www.viaggiatreno.it/infomobilita/resteasy/viaggiatreno/tratteCanvas/{}/{}",
-            from, number
+        let url =
+            format!(
+            "http://www.viaggiatreno.it/infomobilita/resteasy/viaggiatreno/tratteCanvas/{}/{}/{}",
+            from, number, current_timestamp_ms!()
         );
         let response: Vec<mapping::VTDetailedTrainTripLeg> = serde_json::from_value(
             ureq::get(&url)
