@@ -142,7 +142,7 @@ impl TrainTrip {
             .unwrap()
             .into_string()
             .unwrap();
-        let body: Vec<mapping::LFSolution> = serde_json::from_str(&answer).unwrap();
+        let body: Vec<crate::lefrecce::LFSolution> = serde_json::from_str(&answer).unwrap();
         for result in body {
             if chrono::Local.timestamp_millis(result.departuretime as i64) == self.departure.1
                 && chrono::Local.timestamp_millis(result.arrivaltime as i64) == self.arrival.1

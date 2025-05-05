@@ -5,7 +5,9 @@ use types::*;
 mod mapping;
 #[macro_use]
 mod utils;
+mod lefrecce;
 mod types;
+mod viaggiatreno;
 
 #[cfg(test)]
 mod tests;
@@ -115,134 +117,7 @@ impl Trenitalia {
             fast_station_lookup: lookup,
         }
     }
-    /// Builds a TrainNumber enum from the train number and train type
-    fn match_train_type(&self, description: &str, number: u32) -> TrainNumber {
-        let train_type = match description {
-            "RV" => TrainNumber::RegionaleVeloce { number: number },
-            "Regionale" => TrainNumber::Regionale { number: number },
-            "Frecciarossa" => TrainNumber::FrecciaRossa { number: number },
-            "Frecciaargento" => TrainNumber::FrecciaArgento { number: number },
-            "IC" => TrainNumber::InterCity { number: number },
-            "Frecciabianca" => TrainNumber::FrecciaBianca { number: number },
-            "ICN" => TrainNumber::InterCityNotte { number: number },
-            "EN" => TrainNumber::EuroNight { number: number },
-            "EC" => TrainNumber::EuroCity { number: number },
-            "REG" => TrainNumber::Regionale { number: number },
-            "Autobus" => TrainNumber::Bus { number: number },
-            "BUS" => TrainNumber::Bus { number: number },
-            "FR" => TrainNumber::FrecciaRossa { number: number },
-            "FA" => TrainNumber::FrecciaArgento { number: number },
-            "FB" => TrainNumber::FrecciaBianca { number: number },
-            "ECB" => TrainNumber::EuroCity { number: number },
-            _ => TrainNumber::Unknown {
-                number: number,
-                name: String::from(description),
-            },
-        };
-        train_type
-    }
     /// Find a trip between two stations using LeFrecce API
-    fn find_trips_lefrecce(
-        &self,
-        from: &TrainStation,
-        to: &TrainStation,
-        when: &chrono::DateTime<chrono::Local>,
-    ) -> Vec<Vec<TrainTrip>> {
-        if from.id == to.id || from.lefrecce_name.is_none() || from.lefrecce_name.is_none() {
-            return vec![];
-        }
-        let mut result: Vec<Vec<TrainTrip>> = Vec::new();
-        let client = ureq::agent();
-        let url = format!("https://www.lefrecce.it/msite/api/solutions?origin={}&destination={}&arflag=A&adate={}&atime={}&adultno=1&childno=0&direction=A&frecce=false&onlyRegional=false",
-            from.lefrecce_name.clone().unwrap().replace(" ", "%20"),
-            to.lefrecce_name.clone().unwrap().replace(" ", "%20"),
-            when.format("%d/%m/%Y"),
-            when.format("%H")
-        );
-        if cfg!(debug_assertions) {
-            println!("{}", url);
-        }
-        let body: Vec<mapping::LFSolution> = serde_json::from_value(
-            client
-                .get(url.as_str())
-                .call()
-                .unwrap()
-                .into_json()
-                .unwrap(),
-        )
-        .unwrap();
-        for solution in &body {
-            let mut train_trips: Vec<TrainTrip> = Vec::new();
-            let url_details = format!(
-                "https://www.lefrecce.it/msite/api/solutions/{}/standardoffers",
-                solution.idsolution
-            );
-            if cfg!(debug_assertions) {
-                println!("{}", url_details);
-            }
-            let body_details: mapping::LFDetailedSolution = serde_json::from_value(
-                client
-                    .get(url_details.as_str())
-                    .call()
-                    .expect("Failed API call")
-                    .into_json()
-                    .unwrap(),
-            )
-            .unwrap();
-            for leg in &body_details.leglist {
-                for train in &leg.segments {
-                    if train.trainidentifier == String::from("Same") {
-                        continue;
-                    }
-                    let acronym = train
-                        .trainacronym
-                        .as_ref()
-                        .map_or(String::from(""), |x| String::from(x.as_str()));
-                    let train_name_exploded: Vec<&str> = train.trainidentifier.split(' ').collect();
-                    let train_number = train_name_exploded[&train_name_exploded.len() - 1];
-                    let from = &self.stations[*self
-                        .fast_station_lookup
-                        .get(&train.departurestation.to_uppercase())
-                        .expect("Inconsistency in Trenitalia")];
-                    let to = &self.stations[*self
-                        .fast_station_lookup
-                        .get(&train.arrivalstation.to_uppercase())
-                        .expect("Inconsistency in Trenitalia")];
-                    train_trips.push(TrainTrip {
-                        departure: (
-                            from.clone(),
-                            chrono::Local
-                                .datetime_from_str(train.departuretime.as_str(), "%+")
-                                .expect("Data non valida"),
-                        ),
-                        arrival: (
-                            to.clone(),
-                            chrono::Local
-                                .datetime_from_str(train.arrivaltime.as_str(), "%+")
-                                .expect("Data non valida"),
-                        ),
-                        train_number: self.match_train_type(
-                            &acronym,
-                            train_number.parse::<u32>().unwrap_or(
-                                train_number
-                                    .chars()
-                                    .into_iter()
-                                    .map(|x| if x.is_digit(10) { x } else { '0' })
-                                    .collect::<String>()
-                                    .parse::<u32>()
-                                    .unwrap(),
-                            ),
-                        ),
-                    });
-                }
-            }
-            result.push(train_trips);
-        }
-        /*if cfg!(debug_assertions) {
-            println!("{:?}", result);
-        }*/
-        result
-    }
     /// Find a trip between two stations using ViaggiaTreno API and falling back to LeFrecce
     pub fn find_trips(
         &self,
@@ -268,7 +143,7 @@ impl Trenitalia {
         )
         .unwrap();
         if body.soluzioni.len() == 0 {
-            return self.find_trips_lefrecce(from, to, when);
+            return lefrecce::find_trips(from, to, when);
         }
         for soluzione in body.soluzioni {
             let mut train_trips: Vec<TrainTrip> = Vec::new();
@@ -310,7 +185,7 @@ impl Trenitalia {
                 if cfg!(debug_assertions) {
                     println!("filling_to = {:?}", filling_to);
                 }
-                let filling_solutions = self.find_trips_lefrecce(from, filling_to, when);
+                let filling_solutions = lefrecce::find_trips(from, filling_to, when);
                 for filling_solution in filling_solutions.iter() {
                     if filling_solution[0].departure.1
                         >= chrono::Local.timestamp(when.timestamp(), 0)
@@ -347,7 +222,7 @@ impl Trenitalia {
                     )
                     .expect("Inconsistency in Trenitalia")];
                 if old_to.is_some() && old_to != Some(&from.get_name()) {
-                    let filling_solutions = self.find_trips_lefrecce(&old_to_stn, from, &old_ts);
+                    let filling_solutions = lefrecce::find_trips(&old_to_stn, from, &old_ts);
                     for filling_solution in filling_solutions.iter() {
                         if filling_solution[0].departure.1 >= old_ts
                             && filling_solution[&filling_solution.len() - 1].arrival.1
@@ -380,7 +255,7 @@ impl Trenitalia {
                             .datetime_from_str(train_trip.orarioArrivo.as_str(), "%FT%T")
                             .expect("Data non valida"),
                     ),
-                    train_number: self.match_train_type(
+                    train_number: utils::match_train_type(
                         &train_trip.categoriaDescrizione,
                         train_trip.numeroTreno.parse::<u32>().unwrap_or(
                             train_trip
@@ -432,7 +307,7 @@ impl Trenitalia {
                 if cfg!(debug_assertions) {
                     println!("filling_from = {:?}", filling_from);
                 }
-                let filling_solutions = self.find_trips_lefrecce(filling_from, to, when);
+                let filling_solutions = lefrecce::find_trips(filling_from, to, when);
                 for filling_solution in filling_solutions.iter() {
                     if filling_solution[0].departure.1
                         >= chrono::Local
