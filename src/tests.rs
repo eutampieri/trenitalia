@@ -14,3 +14,10 @@ fn can_find_trips_between_two_stations_on_same_line() {
     let trips = t.find_trips(bologna, cesena, &chrono::Local::now());
     assert!(!trips.is_empty());
 }
+
+#[test]
+fn can_obtain_exsisting_train_info() {
+    let t = Trenitalia::new();
+    let result = t.train_info(3905, "Piacenza".to_string());
+    assert!(result.is_ok());
+}
