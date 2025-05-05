@@ -1,10 +1,9 @@
 use super::*;
 
 #[test]
-fn lookup_test() {
+fn existing_station_can_be_found() {
     let t = Trenitalia::new();
-    println!("{:?}", t.find_train_station("bolzano"));
-    assert!(t.fast_station_lookup.get("Bolzano").is_some());
+    assert!(t.find_train_station("bolzano").is_some());
 }
 
 #[test]
