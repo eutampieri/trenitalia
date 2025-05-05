@@ -1,3 +1,5 @@
+/// Module which contains utilities
+
 /// This function returns the normalized typing distance between two strings
 pub fn match_strings(first: &str, second: &str) -> f64 {
     if first.to_lowercase() == second.to_lowercase() {
